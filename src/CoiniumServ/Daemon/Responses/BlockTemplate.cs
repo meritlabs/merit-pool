@@ -72,9 +72,19 @@ namespace CoiniumServ.Daemon.Responses
         public int SizeLimit { get; set; }
 
         /// <summary>
-        /// Objects containing information for Bitcoin transactions (excluding coinbase)
+        /// Objects containing information for Merit transactions (excluding coinbase)
         /// </summary>
         public BlockTemplateTransaction[] Transactions { get; set; }
+
+        /// <summary>
+        /// Objects containing information for Merit invites (excluding coinbase)
+        /// </summary>
+        public BlockTemplateTransaction[] Invites { get; set; }
+
+        /// <summary>
+        /// Objects containing information for Merit invites (excluding coinbase)
+        /// </summary>
+        public BlockTemplateReferral[] Referrals { get; set; }
 
         /// <summary>
         /// always 1 or 2 (at least for bitcoin) - clients MUST understand the implications of the version they use (eg, comply with BIP 0034 for version 2)
