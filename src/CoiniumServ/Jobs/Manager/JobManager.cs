@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -39,6 +39,7 @@ using CoiniumServ.Server.Mining.Getwork;
 using CoiniumServ.Server.Mining.Stratum;
 using CoiniumServ.Shares;
 using CoiniumServ.Transactions;
+using CoiniumServ.Utils.Extensions;
 using Serilog;
 
 namespace CoiniumServ.Jobs.Manager
@@ -78,7 +79,7 @@ namespace CoiniumServ.Jobs.Manager
             _minerManager = minerManager;
             _hashAlgorithm = hashAlgorithm;
             _poolConfig = poolConfig;
-            
+
             _jobCounter = new JobCounter(); // todo make this ioc based too.
 
             _logger = Log.ForContext<JobManager>().ForContext("Component", poolConfig.Coin.Name);
@@ -116,11 +117,11 @@ namespace CoiniumServ.Jobs.Manager
 
             try
             {
-                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired);
+                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired, _poolConfig.Wallet.Address);
 
                 if (blockTemplate.Height == _jobTracker.Current.Height) // if network reports the same block-height with our current job.
                     return; // just return.
-                
+
                 _logger.Verbose("A new block {0} emerged in network, rebroadcasting new work", blockTemplate.Height);
                 CreateAndBroadcastNewJob(false); // broadcast a new job.
             }
@@ -143,7 +144,7 @@ namespace CoiniumServ.Jobs.Manager
 
             if (job != null) // if we were able to create a new job
             {
-                var count = BroadcastJob(job); // broadcast to miners.  
+                var count = BroadcastJob(job); // broadcast to miners.
 
                 _blockPollerTimer.Change(_poolConfig.Job.BlockRefreshInterval, Timeout.Infinite); // reset the block-poller timer so we can start or keep polling for a new block in the network.
 
@@ -153,7 +154,7 @@ namespace CoiniumServ.Jobs.Manager
                     _logger.Information("Broadcasted new job 0x{0:x} to {1} subscribers as network found a new block", job.Id, count);
             }
 
-            // no matter we created a job successfully or not, reset the rebroadcast timer, so we can keep trying. 
+            // no matter we created a job successfully or not, reset the rebroadcast timer, so we can keep trying.
             _reBroadcastTimer.Change(_poolConfig.Job.RebroadcastTimeout * 1000, Timeout.Infinite);
         }
 
@@ -161,11 +162,15 @@ namespace CoiniumServ.Jobs.Manager
         {
             try
             {
-                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired);
+                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired, _poolConfig.Wallet.Address);
 
                 // TODO: convert generation transaction to ioc & DI based.
-                var generationTransaction = new GenerationTransaction(ExtraNonce, _daemonClient, blockTemplate, _poolConfig);
+                var generationTransaction = new GenerationTransaction(ExtraNonce, blockTemplate, _poolConfig);
                 generationTransaction.Create();
+
+                _logger.Information("New prevblockhash: {0}", blockTemplate.PreviousBlockHash);
+                _logger.Information("New prevblockhash reversed: {0}", blockTemplate.PreviousBlockHash.HexToByteArray().ReverseByteOrder().ToHexString());
+                _logger.Information("New prevblockhash reversed twice: {0}", blockTemplate.PreviousBlockHash.HexToByteArray().ReverseByteOrder().ToHexString().HexToByteArray().ReverseByteOrder().ToHexString());
 
                 // create the job notification.
                 var job = new Job(_jobCounter.Next(), _hashAlgorithm, blockTemplate, generationTransaction)

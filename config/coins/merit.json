@@ -1,0 +1,8 @@
+{
+    "name": "Merit",
+    "symbol": "MRT",
+    "algorithm": "cuckoo",
+    "site": "https://merit.me/",
+    "blockExplorer": {
+    }
+}

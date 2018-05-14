@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,16 +24,16 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 /* This file is based on https://github.com/BitKoot/BitcoinRpcSharp */
 
 /* Possible alternative implementations:
- *      https://en.bitcoin.it/wiki/API_reference_(JSON-RPC)#.NET_.28C.23.29 
+ *      https://en.bitcoin.it/wiki/API_reference_(JSON-RPC)#.NET_.28C.23.29
  *      https://github.com/GeorgeKimionis/BitcoinLib
- *      https://code.google.com/p/bitcoinsharp/     
- *      https://sourceforge.net/projects/bitnet 
+ *      https://code.google.com/p/bitcoinsharp/
+ *      https://sourceforge.net/projects/bitnet
  */
 
 // Original bitcoin api call list: https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_Calls_list
@@ -84,7 +84,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Safely copies wallet.dat to destination, which can be a directory or a path with a filename. 
+        /// Safely copies wallet.dat to destination, which can be a directory or a path with a filename.
         /// </summary>
         /// <param name="walletPath">
         /// The location to copy the wallet.dat to. Can be a directory or a path with a filename.
@@ -152,7 +152,7 @@ namespace CoiniumServ.Daemon
         /// <returns>The account the given address belongs to.</returns>
         public string GetAccount(string bitcoinAddress)
         {
-            return MakeRequest<string>("getaccount", bitcoinAddress);
+            return MakeRequest<string>("validateaddress", bitcoinAddress);
         }
 
         /// <summary>
@@ -166,13 +166,13 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Version 0.8: Returns information about the given added node, or all 
-        /// added nodes (note that onetry addnodes are not listed here). If dns 
-        /// is false, only a list of added nodes will be provided, otherwise 
+        /// Version 0.8: Returns information about the given added node, or all
+        /// added nodes (note that onetry addnodes are not listed here). If dns
+        /// is false, only a list of added nodes will be provided, otherwise
         /// connected information will also be available.
         /// </summary>
         /// <param name="dns">
-        /// If false, only a list of added nodes will be provided, otherwise 
+        /// If false, only a list of added nodes will be provided, otherwise
         /// connected information will also be available.
         /// </param>
         /// <param name="node">The node URL.</param>
@@ -194,7 +194,7 @@ namespace CoiniumServ.Daemon
 
         /// <summary>
         /// If [account] is not specified, returns the server's total available balance.
-        /// If [account] is specified, returns the balance in the account. 
+        /// If [account] is specified, returns the balance in the account.
         /// </summary>
         /// <param name="account">The account to get the balance for.</param>
         /// <returns>The balance of the account or the total wallet.</returns>
@@ -215,7 +215,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns information about the block with the given hash. 
+        /// Returns information about the block with the given hash.
         /// </summary>
         /// <param name="hash">The hash of the block to get information about.</param>
         /// <returns>Information about the block.</returns>
@@ -225,7 +225,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns the number of blocks in the longest block chain. 
+        /// Returns the number of blocks in the longest block chain.
         /// </summary>
         /// <returns>The number of blocks in the longest block chain.</returns>
         public long GetBlockCount()
@@ -253,13 +253,13 @@ namespace CoiniumServ.Daemon
         /// https://github.com/bitcoin/bips/blob/master/bip-0022.mediawiki
         /// https://en.bitcoin.it/wiki/Getblocktemplate
         /// </summary>
-        public BlockTemplate GetBlockTemplate(bool modeRequired = false)
+        public BlockTemplate GetBlockTemplate(bool modeRequired, string payoutAddress)
         {
             var data = new Dictionary<string, object>();
 
             if (!modeRequired)
             {
-                // bitcoin variants can accept capabilities: https://github.com/bitcoin/bitcoin/blob/7388b74cd2c5e3b71e991d26953c89c059ba6f2f/src/rpcmining.cpp#L298            
+                // bitcoin variants can accept capabilities: https://github.com/bitcoin/bitcoin/blob/7388b74cd2c5e3b71e991d26953c89c059ba6f2f/src/rpcmining.cpp#L298
                 data.Add("capabilities", new List<string> { "coinbasetxn", "workid", "coinbase/append" });
             }
             else
@@ -276,7 +276,7 @@ namespace CoiniumServ.Daemon
         /// </summary>
         /// <param name="blockHex"></param>
         /// <returns></returns>
-        public BlockTemplate GetBlockTemplate(string blockHex)
+        public BlockTemplate GetBlockTemplate(string blockHex, string payoutAddress)
         {
             var data = new Dictionary<string, object>
             {
@@ -296,7 +296,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns the number of connections to other nodes. 
+        /// Returns the number of connections to other nodes.
         /// </summary>
         /// <returns>The number of connections to other nodes.</returns>
         public long GetConnectionCount()
@@ -305,7 +305,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns the proof-of-work difficulty as a multiple of the minimum difficulty. 
+        /// Returns the proof-of-work difficulty as a multiple of the minimum difficulty.
         /// </summary>
         /// <returns>The proof of work difficulty as a multiple of the minimum difficulty.</returns>
         public decimal GetDifficulty()
@@ -314,7 +314,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns true or false whether bitcoind is currently generating hashes. 
+        /// Returns true or false whether bitcoind is currently generating hashes.
         /// </summary>
         /// <returns>True if bitcoind is currently generating hashes.</returns>
         public bool GetGenerate()
@@ -374,7 +374,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns an object containing mining-related information: blocks, currentblocksize, currentblocktx, difficulty, errors, generate, genproclimit, hashespersec, pooledtx, testnet 
+        /// Returns an object containing mining-related information: blocks, currentblocksize, currentblocktx, difficulty, errors, generate, genproclimit, hashespersec, pooledtx, testnet
         /// </summary>
         /// <returns>An object containing mining information.</returns>
         public MiningInfo GetMiningInfo()
@@ -383,7 +383,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns a new bitcoin address for receiving payments. If [account] is specified (recommended), it is added to the address book so payments received with the address will be credited to [account]. 
+        /// Returns a new bitcoin address for receiving payments. If [account] is specified (recommended), it is added to the address book so payments received with the address will be credited to [account].
         /// </summary>
         /// <param name="account">The account to add the new address to.</param>
         /// <returns>The new address.</returns>
@@ -393,7 +393,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Version 0.7: Returns data about each connected node. 
+        /// Version 0.7: Returns data about each connected node.
         /// </summary>
         /// <returns>A list of objects containing information about connected nodes.</returns>
         public IList<PeerInfo> GetPeerInfo()
@@ -419,11 +419,11 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Version 0.7: Returns raw transaction representation for given transaction id. 
+        /// Version 0.7: Returns raw transaction representation for given transaction id.
         /// </summary>
         /// <param name="txId">The transaction id.</param>
         /// <param name="verbose">
-        /// The verbosity level. If it is higher than 0, 
+        /// The verbosity level. If it is higher than 0,
         /// a lot more information will be returned.
         /// </param>
         /// <returns>The raw transaction hex.</returns>
@@ -439,9 +439,9 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns the total amount received by addresses with [account] in transactions 
-        /// with at least [minconf] confirmations. If [account] not provided return will 
-        /// include all transactions to all accounts. (version 0.3.24)  
+        /// Returns the total amount received by addresses with [account] in transactions
+        /// with at least [minconf] confirmations. If [account] not provided return will
+        /// include all transactions to all accounts. (version 0.3.24)
         /// </summary>
         /// <param name="account">The account to get the balance for.</param>
         /// <param name="minconf">Minimum amount of confirmations before a transaction is included.</param>
@@ -452,12 +452,12 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns the total amount received by bitcoinaddress in transactions with at 
-        /// least [minconf] confirmations. While some might consider this obvious, value 
-        /// reported by this only considers *receiving* transactions. It does not check 
-        /// payments that have been made *from* this address. In other words, this is 
-        /// not "getaddressbalance". Works only for addresses in the local wallet, 
-        /// external addresses will always show 0. 
+        /// Returns the total amount received by bitcoinaddress in transactions with at
+        /// least [minconf] confirmations. While some might consider this obvious, value
+        /// reported by this only considers *receiving* transactions. It does not check
+        /// payments that have been made *from* this address. In other words, this is
+        /// not "getaddressbalance". Works only for addresses in the local wallet,
+        /// external addresses will always show 0.
         /// </summary>
         /// <param name="bitcoinAddress">The address to get the balance for.</param>
         /// <param name="minconf">Minimum amount of confirmations before a transaction is included.</param>
@@ -468,16 +468,16 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns an object about the given transaction containing: 
-        /// amount : total amount of the transaction 
-        /// confirmations : number of confirmations of the transaction 
-        /// txid : the transaction ID 
-        /// time : time associated with the transaction[1]. 
-        /// details - An array of objects containing: 
-        ///  - account 
-        ///  - address 
-        ///  - category 
-        ///  - amount 
+        /// Returns an object about the given transaction containing:
+        /// amount : total amount of the transaction
+        /// confirmations : number of confirmations of the transaction
+        /// txid : the transaction ID
+        /// time : time associated with the transaction[1].
+        /// details - An array of objects containing:
+        ///  - account
+        ///  - address
+        ///  - category
+        ///  - amount
         ///  - fee
         /// </summary>
         /// <param name="txId">The transaction id.</param>
@@ -500,7 +500,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns statistics about the unspent transaction output (UTXO) set. 
+        /// Returns statistics about the unspent transaction output (UTXO) set.
         /// </summary>
         /// <returns>An object containing information about the unspent tx set.</returns>
         public TxOutSetInfo GetTxOutSetInfo()
@@ -522,7 +522,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// The Getwork Completion response from the Bitcoin daemon is very simply a true or false value. If the value is true, then the hash was accepted and a new block has been created! If the value is false then the hash was rejected. 
+        /// The Getwork Completion response from the Bitcoin daemon is very simply a true or false value. If the value is true, then the hash was accepted and a new block has been created! If the value is false then the hash was rejected.
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -532,8 +532,8 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Adds a private key (as returned by dumpprivkey) to your wallet. This 
-        /// may take a while, as a rescan is done, looking for existing transactions. 
+        /// Adds a private key (as returned by dumpprivkey) to your wallet. This
+        /// may take a while, as a rescan is done, looking for existing transactions.
         /// Optional [rescan] parameter added in 0.8.0.
         /// </summary>
         /// <param name="bitcoinPrivKey">Private key to import.</param>
@@ -553,7 +553,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns Object that has account names as keys, account balances as values. 
+        /// Returns Object that has account names as keys, account balances as values.
         /// </summary>
         /// <returns>A dictionary with account names as keys and account balances as values.</returns>
         public Dictionary<string, decimal> ListAccounts()
@@ -571,9 +571,9 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns an array of objects containing: 
-        /// account : the account of the receiving addresses 
-        /// amount : total amount received by addresses with this account 
+        /// Returns an array of objects containing:
+        /// account : the account of the receiving addresses
+        /// amount : total amount received by addresses with this account
         /// confirmations : number of confirmations of the most recent transaction included
         /// </summary>
         /// <param name="minconf">Minimum number of confirmations before the transaction is included in the result.</param>
@@ -585,11 +585,11 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns an array of objects containing: 
-        /// address : receiving address 
-        /// account : the account of the receiving address 
-        /// amount : total amount received by the address 
-        /// confirmations : number of confirmations of the most recent transaction included 
+        /// Returns an array of objects containing:
+        /// address : receiving address
+        /// account : the account of the receiving address
+        /// amount : total amount received by the address
+        /// confirmations : number of confirmations of the most recent transaction included
         /// To get a list of accounts on the system, execute bitcoind listreceivedbyaddress 0 true
         /// </summary>
         /// <param name="minconf">Minimum number of confirmations before the transaction is included in the result.</param>
@@ -612,8 +612,8 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Returns up to [count] most recent transactions skipping the first [from] 
-        /// transactions for account [account]. If [account] not provided will return 
+        /// Returns up to [count] most recent transactions skipping the first [from]
+        /// transactions for account [account]. If [account] not provided will return
         /// recent transaction from all accounts.
         /// </summary>
         /// <param name="account">The account to list transactions for.</param>
@@ -667,8 +667,8 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Amount is a real and is rounded to 8 decimal places. Will send the given amount to 
-        /// the given address, ensuring the account has a valid balance using [minconf] 
+        /// Amount is a real and is rounded to 8 decimal places. Will send the given amount to
+        /// the given address, ensuring the account has a valid balance using [minconf]
         /// confirmations. Returns the transaction ID if successful (not in JSON object).
         /// </summary>
         /// <param name="fromAccount">From account.</param>
@@ -684,7 +684,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Send bitcoins to multiple addresses in one transaction. 
+        /// Send bitcoins to multiple addresses in one transaction.
         /// Amounts are double-precision floating point numbers.
         /// </summary>
         /// <param name="fromAccount">The account to send the bitcoins from.</param>
@@ -720,8 +720,8 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Sets the account associated with the given address. Assigning 
-        /// address that is already assigned to the same account will 
+        /// Sets the account associated with the given address. Assigning
+        /// address that is already assigned to the same account will
         /// create a new address associated with that account.
         /// </summary>
         /// <param name="bitcoinAddress">The bitcoin address to assocaite.</param>
@@ -732,7 +732,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Generate is true or false to turn generation on or off. Generation is 
+        /// Generate is true or false to turn generation on or off. Generation is
         /// limited to [genproclimit] processors, -1 is unlimited.
         /// </summary>
         /// <param name="generate">True to turn generation on.</param>
@@ -764,7 +764,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Version 0.7: Adds signatures to a raw transaction and returns the resulting raw transaction. 
+        /// Version 0.7: Adds signatures to a raw transaction and returns the resulting raw transaction.
         /// </summary>
         /// <param name="rawTransaction">The raw transaction to sign.</param>
         /// <returns>The signed transaction.</returns>
@@ -788,7 +788,7 @@ namespace CoiniumServ.Daemon
 
 
         /// <summary>
-        /// Return information about the bitcoin address. 
+        /// Return information about the bitcoin address.
         /// </summary>
         /// <param name="walletAddress">The bitcoin address.</param>
         /// <returns></returns>
@@ -796,9 +796,9 @@ namespace CoiniumServ.Daemon
         {
             return MakeRequest<ValidateAddress>("validateaddress", walletAddress);
         }
-        
+
         /// <summary>
-        /// Return information about the bitcoin address. 
+        /// Return information about the bitcoin address.
         /// </summary>
         /// <param name="walletAddress">The bitcoin address.</param>
         /// <returns></returns>
@@ -820,9 +820,9 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Removes the wallet encryption key from memory, locking the wallet. 
-        /// After calling this method, you will need to call walletpassphrase 
-        /// again before being able to call any methods which require the wallet 
+        /// Removes the wallet encryption key from memory, locking the wallet.
+        /// After calling this method, you will need to call walletpassphrase
+        /// again before being able to call any methods which require the wallet
         /// to be unlocked.
         /// </summary>
         public void WalletLock()
@@ -832,7 +832,7 @@ namespace CoiniumServ.Daemon
 
         /// <summary>
         /// Stores the wallet decryption key in memory for timeout seconds. This essentialy
-        /// unlocks the wallet for the given time. During this time more commands are 
+        /// unlocks the wallet for the given time. During this time more commands are
         /// allowed to be invoked (like transferring bitcoins).
         /// </summary>
         /// <param name="passphrase">Pass phrase to use.</param>

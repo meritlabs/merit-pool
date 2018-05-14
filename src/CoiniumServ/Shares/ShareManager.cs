@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,13 +24,14 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
 using System.Diagnostics;
 using System.Linq;
 using AustinHarris.JsonRpc;
+using CoiniumServ.Coin.Address.Exceptions;
 using CoiniumServ.Daemon;
 using CoiniumServ.Daemon.Exceptions;
 using CoiniumServ.Jobs.Tracker;
@@ -89,14 +90,22 @@ namespace CoiniumServ.Shares
         /// <param name="nTimeString">The n time string.</param>
         /// <param name="nonceString">The nonce string.</param>
         /// <returns></returns>
-        public IShare ProcessShare(IStratumMiner miner, string jobId, string extraNonce2, string nTimeString, string nonceString)
+        public IShare ProcessShare(IStratumMiner miner, string jobId, string extraNonce2, string nTimeString, string nonceString, string cycle)
         {
             // check if the job exists
             var id = Convert.ToUInt64(jobId, 16);
             var job = _jobTracker.Get(id);
 
+            string[] cycleEdgesStrs = cycle.Split(',');
+            UInt32[] cycleEdges = new UInt32[cycleEdgesStrs.Length];
+
+            for (var i = 0; i < cycleEdgesStrs.Length; i++) {
+                cycleEdges[i] = Convert.ToUInt32(cycleEdgesStrs[i], 16);
+            }
+
+
             // create the share
-            var share = new Share(miner, id, job, extraNonce2, nTimeString, nonceString);
+            var share = new Share(miner, id, job, extraNonce2, nTimeString, nonceString, cycleEdges);
 
             if (share.IsValid)
                 HandleValidShare(share);
@@ -124,7 +133,7 @@ namespace CoiniumServ.Shares
             // check if share is a block candidate
             if (!share.IsBlockCandidate)
                 return;
-            
+
             // submit block candidate to daemon.
             var accepted = SubmitBlock(share);
 
@@ -146,7 +155,7 @@ namespace CoiniumServ.Shares
             switch (share.Error)
             {
                 case ShareError.DuplicateShare:
-                    exception = new DuplicateShareError(share.Nonce);                    
+                    exception = new DuplicateShareError(share.Nonce);
                     break;
                 case ShareError.IncorrectExtraNonce2Size:
                     exception = new OtherError("Incorrect extranonce2 size");
@@ -176,13 +185,15 @@ namespace CoiniumServ.Shares
         private bool SubmitBlock(IShare share)
         {
             // TODO: we should try different submission techniques and probably more then once: https://github.com/ahmedbodi/stratum-mining/blob/master/lib/bitcoin_rpc.py#L65-123
-
+            _logger.Information("Share: {0}", share.BlockHex.ToHexString());
             try
             {
                 if (_poolConfig.Coin.Options.SubmitBlockSupported) // see if submitblock() is available.
                     _daemonClient.SubmitBlock(share.BlockHex.ToHexString()); // submit the block.
                 else
-                    _daemonClient.GetBlockTemplate(share.BlockHex.ToHexString()); // use getblocktemplate() if submitblock() is not supported.
+                    _daemonClient.GetBlockTemplate(share.BlockHex.ToHexString(), _poolConfig.Wallet.Address); // use getblocktemplate() if submitblock() is not supported.
+
+                _logger.Debug("Getting share block [{0}]", share.BlockHash.ToHexString());
 
                 var block = _daemonClient.GetBlock(share.BlockHash.ToHexString()); // query the block.
 
@@ -213,12 +224,12 @@ namespace CoiniumServ.Shares
                     return false;
                 }
 
-                var poolOutput = genTx.GetPoolOutput(_poolConfig.Wallet.Adress, _poolAccount); // get the output that targets pool's central address.
+                var poolOutput = genTx.GetPoolOutput(_poolConfig.Wallet.Address, _poolAccount); // get the output that targets pool's central address.
 
                 // make sure the blocks generation transaction contains our central pool wallet address
                 if (poolOutput == null)
                 {
-                    _logger.Debug("Submitted block [{0}] doesn't seem to belong us as generation transaction doesn't contain an output for pool's central wallet address: {0:}", block.Height, _poolConfig.Wallet.Adress);
+                    _logger.Debug("Submitted block [{0}] doesn't seem to belong us as generation transaction doesn't contain an output for pool's central wallet address: {0:}", block.Height, _poolConfig.Wallet.Address);
                     return false;
                 }
 
@@ -259,13 +270,17 @@ namespace CoiniumServ.Shares
         {
             try
             {
-                _poolAccount = !_poolConfig.Coin.Options.UseDefaultAccount // if UseDefaultAccount is not set
-                    ? _daemonClient.GetAccount(_poolConfig.Wallet.Adress) // find the account of the our pool address.
-                    : ""; // use the default account.
+                var res = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address); // use the default account.
+
+                if (!res.IsValid || !res.IsConfirmed) {
+                    throw new InvalidWalletAddressException(_poolConfig.Wallet.Address);
+                }
+
+                _poolAccount = res.Address;
             }
             catch (RpcException e)
             {
-                _logger.Error("Error getting account for pool central wallet address: {0:l} - {1:l}", _poolConfig.Wallet.Adress, e.Message);
+                _logger.Error("Error getting account for pool central wallet address: {0:l} - {1:l}", _poolConfig.Wallet.Address, e.Message);
             }
         }
     }

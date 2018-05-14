@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -45,6 +45,11 @@ namespace CoiniumServ.Daemon.Responses
         /// the compressed difficulty in hexadecimal
         /// </summary>
         public string Bits { get; set; }
+
+        /// <summary>
+        /// number of cuckoo cycle edge bits
+        /// </summary>
+        public byte EdgeBits { get; set; }
 
         /// <summary>
         /// the current time as seen by the server (recommended for block time) - note this is not necessarily the system clock, and must fall within the mintime/maxtime rules
@@ -72,17 +77,17 @@ namespace CoiniumServ.Daemon.Responses
         public int SizeLimit { get; set; }
 
         /// <summary>
-        /// Objects containing information for Merit transactions (excluding coinbase)
+        /// Objects containing information for Merit transactions
         /// </summary>
         public BlockTemplateTransaction[] Transactions { get; set; }
 
         /// <summary>
-        /// Objects containing information for Merit invites (excluding coinbase)
+        /// Objects containing information for Merit invites
         /// </summary>
         public BlockTemplateTransaction[] Invites { get; set; }
 
         /// <summary>
-        /// Objects containing information for Merit invites (excluding coinbase)
+        /// Objects containing information for Merit referrals
         /// </summary>
         public BlockTemplateReferral[] Referrals { get; set; }
 
@@ -97,19 +102,9 @@ namespace CoiniumServ.Daemon.Responses
         public CoinBaseAux CoinBaseAux { get; set; }
 
         /// <summary>
-        /// information for coinbase transaction
-        /// </summary>
-        public int CoinbaseTxt { get; set; }
-
-        /// <summary>
         /// total funds available for the coinbase (in Satoshis)
         /// </summary>
         public Int64 Coinbasevalue { get; set; }
-
-        /// <summary>
-        /// if provided, this value must be returned with results (see Block Submission)
-        /// </summary>
-        public int WorkId { get; set; }
 
         // extra ones - based on https://github.com/CoiniumServ/CoiniumServ/wiki/Litecoin-Testnet-Stream
 
@@ -123,8 +118,8 @@ namespace CoiniumServ.Daemon.Responses
     }
 
     /// <summary>
-    /// data that SHOULD be included in the coinbase's scriptSig content. Only the values (hexadecimal byte-for-byte) in this Object should be included, not the keys. 
-    /// This does not include the block height, which is required to be included in the scriptSig by BIP 0034. It is advisable to encode values inside "PUSH" opcodes, 
+    /// data that SHOULD be included in the coinbase's scriptSig content. Only the values (hexadecimal byte-for-byte) in this Object should be included, not the keys.
+    /// This does not include the block height, which is required to be included in the scriptSig by BIP 0034. It is advisable to encode values inside "PUSH" opcodes,
     /// so as to not inadvertantly expend SIGOPs (which are counted toward limits, despite not being executed).
     /// </summary>
     public class CoinBaseAux

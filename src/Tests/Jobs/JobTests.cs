@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -75,9 +75,9 @@ using Xunit;
     txInSequence: 0 packUInt32LE: 00000000
     outputTransactions: 0280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac
     txLockTime: 0 packUInt32LE: 00000000
-    txComment: 
+    txComment:
     p2: 0d2f6e6f64655374726174756d2f000000000280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac00000000
-    getJobParams: 
+    getJobParams:
     [
         "1",
         "54561e9e91f7d344768b6752c301b7557716776419febc959db64f1922a9174d",
@@ -100,7 +100,6 @@ namespace CoiniumServ.Tests.Jobs
         private readonly IBlockTemplate _blockTemplate;
         private readonly IExtraNonce _extraNonce;
         private readonly ISignatureScript _signatureScript;
-        private readonly IOutputs _outputs;
         private readonly IJobCounter _jobCounter;
         private readonly IHashAlgorithm _hashAlgorithm;
         private readonly IGenerationTransaction _generationTransaction;
@@ -138,41 +137,12 @@ namespace CoiniumServ.Tests.Jobs
             coinConfig.Options.IsProofOfStakeHybrid.Returns(false);
             _poolConfig.Coin.Returns(coinConfig);
 
-            // outputs
-            _outputs = Substitute.For<Outputs>(_daemonClient, coinConfig);
-            double blockReward = 5000000000; // the amount rewarded by the block.
-
-            // create rewards config.
-            var rewardsConfig = Substitute.For<IRewardsConfig>();
-            _poolConfig.Rewards.Returns(rewardsConfig);         
-
-            // create sample reward
-            var amount = blockReward * 0.01;
-            blockReward -= amount;
-            var rewards = new Dictionary<string, float> { {"mrwhWEDnU6dUtHZJ2oBswTpEdbBHgYiMji", (float) amount} };
-
-            rewardsConfig.GetEnumerator().Returns(rewards.GetEnumerator());
-            foreach (var pair in rewards)
-            {
-                _outputs.AddRecipient(pair.Key, pair.Value);
-            }
-
-            // create wallet config.
-            var walletConfig = Substitute.For<IWalletConfig>();
-            _poolConfig.Wallet.Returns(walletConfig);
-
-            // create sample pool central wallet output.
-            walletConfig.Adress.Returns("mk8JqN1kNWju8o3DXEijiJyn7iqkwktAWq");
-            _outputs.AddPoolWallet(walletConfig.Adress, blockReward);
-
             // job counter
             _jobCounter = Substitute.For<JobCounter>();
 
             // generation transaction.
-            _generationTransaction = new GenerationTransaction(_extraNonce, _daemonClient, _blockTemplate, _poolConfig);
-            _generationTransaction.Inputs.First().SignatureScript = _signatureScript;
-            _generationTransaction.Outputs = _outputs;
-            _generationTransaction.Create();     
+            _generationTransaction = new GenerationTransaction(_extraNonce, _blockTemplate, _poolConfig);
+            _generationTransaction.Create();
 
             // hash algorithm
             _hashAlgorithm = new Scrypt();

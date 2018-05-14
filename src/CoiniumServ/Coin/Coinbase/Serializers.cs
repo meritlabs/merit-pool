@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -50,19 +50,31 @@ namespace CoiniumServ.Coin.Coinbase
         /// <param name="coinbase"></param>
         /// <param name="isProofOfStakeHybrid">Are we serializing a proof-of-stake coin block</param>
         /// <returns></returns>
-        public static byte[] SerializeBlock(IJob job, byte[] header, byte[] coinbase, bool isProofOfStakeHybrid = false)
+        public static byte[] SerializeBlock(IJob job, byte[] header, byte[] coinbase, byte[] cycle, bool isProofOfStakeHybrid = false)
         {
             byte[] result;
 
             using (var stream = new MemoryStream())
             {
                 stream.WriteBytes(header);
-                stream.WriteBytes(VarInt((UInt32)job.BlockTemplate.Transactions.Length + 1));
+                stream.WriteBytes(cycle);
+                stream.WriteBytes(VarInt((UInt32)job.BlockTemplate.Transactions.Length));
                 stream.WriteBytes(coinbase);
 
-                foreach (var transaction in job.BlockTemplate.Transactions)
+                // skip coinbase tx as it was updated and written above
+                for (var i = 1; i < job.BlockTemplate.Transactions.Length; i++)
                 {
-                    stream.WriteBytes(transaction.Data.HexToByteArray());
+                    stream.WriteBytes(job.BlockTemplate.Transactions[i].Data.HexToByteArray());
+                }
+
+                stream.WriteBytes(VarInt((UInt32)job.BlockTemplate.Invites.Length));
+                foreach(var invite in job.BlockTemplate.Invites) {
+                    stream.WriteBytes(invite.Data.HexToByteArray());
+                }
+
+                stream.WriteBytes(VarInt((UInt32)job.BlockTemplate.Referrals.Length));
+                foreach(var referral in job.BlockTemplate.Referrals) {
+                    stream.WriteBytes(referral.Data.HexToByteArray());
                 }
 
                 if (isProofOfStakeHybrid) // check if we are serializing a block for proof-of-stake coin.
@@ -87,13 +99,25 @@ namespace CoiniumServ.Coin.Coinbase
         /// <param name="merkleRoot"></param>
         /// <param name="nTime"></param>
         /// <param name="nonce"></param>
+        /// <param name="cycle"></param>
         /// <returns></returns>
-        public static byte[] SerializeHeader(IJob job, byte[] merkleRoot, UInt32 nTime, UInt32 nonce)
+        public static byte[] SerializeHeader(IJob job, byte[] merkleRoot, UInt32 nTime, UInt32 nonce, UInt32[] cycle)
         {
             byte[] result;
 
+            var c = new UInt32[cycle.Length];
+
+            for (int i = 0; i < cycle.Length; i++) {
+                c[i] = cycle[cycle.Length - 1 - i];
+            }
+
             using (var stream = new MemoryStream())
             {
+                // foreach (var edge in c) {
+                //     stream.WriteValueU32(edge.BigEndian());
+                // }
+                // stream.WriteBytes(Serializers.VarInt((uint) c.Length));
+                stream.WriteByte(job.EdgeBits);
                 stream.WriteValueU32(nonce.BigEndian());
                 stream.WriteValueU32(Convert.ToUInt32(job.EncodedDifficulty, 16).BigEndian());
                 stream.WriteValueU32(nTime.BigEndian());
@@ -107,6 +131,8 @@ namespace CoiniumServ.Coin.Coinbase
 
             return result;
         }
+// 00000028 0eefd9a7 3c8abf53 226afff3 29003427 d9eb32c7 09f2aaa2 90bd8a85 cea86982 c4bda444 ac7c0cff 2024012b 84a614e9 02048494 c53c7334 5d4ea51e d82bf324 475bf85a 62b63620 33333383 17
+// 28000000 a7d9ef0e 53bf8a3c f3ff6a22 27340029 c732ebd9 a2aaf209 858abd90 8269a8ce 197b06b5 2fee72c8 33780ab5 948ba385 2199db28 204ae9be 8bfcba95 45277c97 5af85b47 2036b662 83333333 00
 
         public static byte[] SerializeCoinbase(IJob job, UInt32 extraNonce1, UInt32 extraNonce2)
         {
@@ -132,8 +158,8 @@ namespace CoiniumServ.Coin.Coinbase
         /// Encoded an integer to save space.
         /// </summary>
         /// <remarks>
-        /// Integer can be encoded depending on the represented value to save space. Variable length integers always precede 
-        /// an array/vector of a type of data that may vary in length. Longer numbers are encoded in little endian. 
+        /// Integer can be encoded depending on the represented value to save space. Variable length integers always precede
+        /// an array/vector of a type of data that may vary in length. Longer numbers are encoded in little endian.
         /// </remarks>
         /// <specification>https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_integer</specification>
         /// <example>

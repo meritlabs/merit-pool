@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CoiniumServ.Accounts;
+using CoiniumServ.Coin.Address.Exceptions;
 using CoiniumServ.Daemon;
 using CoiniumServ.Persistance.Layers;
 using CoiniumServ.Pools;
@@ -81,7 +82,7 @@ namespace CoiniumServ.Payments
         {
             _stopWatch.Start();
 
-            var candidates = GetTransactionCandidates(); // get the pending payments available for execution.            
+            var candidates = GetTransactionCandidates(); // get the pending payments available for execution.
             var executedPayments = ExecutePayments(candidates); // try to execute the payments.
             CommitTransactions(executedPayments); // commit them to storage layer.
 
@@ -155,7 +156,7 @@ namespace CoiniumServ.Payments
                 var outputs = filtered.ToDictionary(x => x.Key, x => x.Value.Sum(y => y.Payment.Amount));
 
                 // send the payments all-together.
-                var txHash = _daemonClient.SendMany(_poolAccount, outputs);
+                var txHash = _daemonClient.SendMany(string.Empty, outputs);
 
                 // loop through all executed payments
                 filtered.ToList().ForEach(x => x.Value.ForEach(y =>
@@ -194,26 +195,26 @@ namespace CoiniumServ.Payments
             {
                 if(newWallet == true)
                 {
-                    var result = _daemonClient.ValidateAddress(_poolConfig.Wallet.Adress);
-                    var resultnew = _daemonClient.GetAddressInfo(_poolConfig.Wallet.Adress);
-                    
+                    var result = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address);
+                    var resultnew = _daemonClient.GetAddressInfo(_poolConfig.Wallet.Address);
+
                     if (result.IsValid && resultnew.IsMine)
                         return true;
-                                 
-                    _logger.Error("Halted as daemon we are connected to does not own the pool address: {0:l}.", _poolConfig.Wallet.Adress);
+
+                    _logger.Error("Halted as daemon we are connected to does not own the pool address: {0:l}.", _poolConfig.Wallet.Address);
                     return false;
                 }
                 else
                 {
-                    var result = _daemonClient.ValidateAddress(_poolConfig.Wallet.Adress);
+                    var result = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address);
 
                     // make sure the pool central wallet address is valid and belongs to the daemon we are connected to.
-                    if (result.IsValid && result.IsMine)
+                    if (result.IsValid && result.IsConfirmed && result.IsMine)
                         return true;
 
-                    _logger.Error("Halted as daemon we are connected to does not own the pool address: {0:l}.", _poolConfig.Wallet.Adress);
+                    _logger.Error("Halted as daemon we are connected to does not own the pool address: {0:l}.", _poolConfig.Wallet.Address);
                     return false;
-                }                               
+                }
             }
             catch (Exception e)
             {
@@ -226,9 +227,14 @@ namespace CoiniumServ.Payments
         {
             try
             {
-                _poolAccount = !_poolConfig.Coin.Options.UseDefaultAccount // if UseDefaultAccount is not set
-                    ? _daemonClient.GetAccount(_poolConfig.Wallet.Adress) // find the account of the our pool address.
-                    : ""; // use the default account.
+                var res = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address); // use the default account.
+
+                if (!res.IsValid || !res.IsConfirmed) {
+                    throw new InvalidWalletAddressException(_poolConfig.Wallet.Address);
+                }
+
+                _poolAccount = res.Address;
+
                 return true;
             }
             catch (Exception e)

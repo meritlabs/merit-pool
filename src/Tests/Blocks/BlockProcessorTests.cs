@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -53,7 +53,7 @@ namespace CoiniumServ.Tests.Blocks
 
         public BlockProcessorTests()
         {
-            // create mockup objects required for tests.            
+            // create mockup objects required for tests.
             _daemonClient = Substitute.For<IDaemonClient>();
             _poolConfig = Substitute.For<IPoolConfig>();
             _storageLayer = Substitute.For<IStorageLayer>();
@@ -88,7 +88,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: coin daemon returns block-info with negative confirmations.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Confirmations = -1 });            
+            _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Confirmations = -1 });
 
             // query the block.
             var exposed = Exposed.From(new BlockProcessor(_poolConfig, _daemonClient, _storageLayer));
@@ -129,7 +129,7 @@ namespace CoiniumServ.Tests.Blocks
                         Code = -5 // 'Invalid or non-wallet transaction id'
                     }
                 });
-            });          
+            });
 
             // query the block.
             var exposed = Exposed.From(new BlockProcessor(_poolConfig, _daemonClient, _storageLayer));
@@ -160,7 +160,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: generation transaction output doesn't match pool output address.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _poolConfig.Wallet.Adress.Returns("POOL_ADDRESS");
+            _poolConfig.Wallet.Address.Returns("POOL_ADDRESS");
 
             _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Tx = new List<string> { "TX_HASH" } });
             _daemonClient.GetTransaction("TX_HASH").Returns(info => new Transaction
@@ -190,7 +190,7 @@ namespace CoiniumServ.Tests.Blocks
 
             // query the block.
             var exposed = Exposed.From(new BlockProcessor(_poolConfig, _daemonClient, _storageLayer));
-            exposed._poolAccount = "POOL_ACCOUNT";          
+            exposed._poolAccount = "POOL_ACCOUNT";
             exposed.QueryBlock(block);
 
             // block should be marked as orphaned.
@@ -202,7 +202,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: set block reward based on pool output value.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _poolConfig.Wallet.Adress.Returns("POOL_ADDRESS");
+            _poolConfig.Wallet.Address.Returns("POOL_ADDRESS");
 
             _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Tx = new List<string> { "TX_HASH" } });
             _daemonClient.GetTransaction("TX_HASH").Returns(info => new Transaction
@@ -223,7 +223,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: we supply a pending block which should stay as pending as pool output category is still 'immature'.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _poolConfig.Wallet.Adress.Returns("POOL_ADDRESS");
+            _poolConfig.Wallet.Address.Returns("POOL_ADDRESS");
 
             _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Tx = new List<string> { "TX_HASH" } });
             _daemonClient.GetTransaction("TX_HASH").Returns(info => new Transaction
@@ -244,7 +244,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: we supply a pending block which should stay as pending as pool output category is still 'immature'.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _poolConfig.Wallet.Adress.Returns("POOL_ADDRESS");
+            _poolConfig.Wallet.Address.Returns("POOL_ADDRESS");
 
             _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Tx = new List<string> { "TX_HASH" } });
             _daemonClient.GetTransaction("TX_HASH").Returns(info => new Transaction
@@ -265,7 +265,7 @@ namespace CoiniumServ.Tests.Blocks
         {
             // test case: we supply a pending block which should stay as pending as pool output category is still 'immature'.
             var block = new PersistedBlock(1, false, false, false, "BLOCK_HASH", "TX_HASH", 0, 0, DateTime.Now);
-            _poolConfig.Wallet.Adress.Returns("POOL_ADDRESS");
+            _poolConfig.Wallet.Address.Returns("POOL_ADDRESS");
 
             _daemonClient.GetBlock("BLOCK_HASH").Returns(info => new Block { Tx = new List<string> { "TX_HASH" } });
             _daemonClient.GetTransaction("TX_HASH").Returns(info => new Transaction

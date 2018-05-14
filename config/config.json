@@ -16,12 +16,12 @@
     "website": {
         "enabled": true,
         "bind": "",
-        "port": 80,
+        "port": 8090,
         "template": "default",
         "feed": "",
         "backend": {
             "metrics": {
-                "enabled": false
+                "enabled": true
             }
         }
     },
@@ -51,4 +51,4 @@
             }
         ]
     }
-} 
+}
