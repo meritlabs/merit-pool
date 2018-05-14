@@ -101,22 +101,12 @@ namespace CoiniumServ.Coin.Coinbase
         /// <param name="nonce"></param>
         /// <param name="cycle"></param>
         /// <returns></returns>
-        public static byte[] SerializeHeader(IJob job, byte[] merkleRoot, UInt32 nTime, UInt32 nonce, UInt32[] cycle)
+        public static byte[] SerializeHeader(IJob job, byte[] merkleRoot, UInt32 nTime, UInt32 nonce)
         {
             byte[] result;
 
-            var c = new UInt32[cycle.Length];
-
-            for (int i = 0; i < cycle.Length; i++) {
-                c[i] = cycle[cycle.Length - 1 - i];
-            }
-
             using (var stream = new MemoryStream())
             {
-                // foreach (var edge in c) {
-                //     stream.WriteValueU32(edge.BigEndian());
-                // }
-                // stream.WriteBytes(Serializers.VarInt((uint) c.Length));
                 stream.WriteByte(job.EdgeBits);
                 stream.WriteValueU32(nonce.BigEndian());
                 stream.WriteValueU32(Convert.ToUInt32(job.EncodedDifficulty, 16).BigEndian());
@@ -131,8 +121,6 @@ namespace CoiniumServ.Coin.Coinbase
 
             return result;
         }
-// 00000028 0eefd9a7 3c8abf53 226afff3 29003427 d9eb32c7 09f2aaa2 90bd8a85 cea86982 c4bda444 ac7c0cff 2024012b 84a614e9 02048494 c53c7334 5d4ea51e d82bf324 475bf85a 62b63620 33333383 17
-// 28000000 a7d9ef0e 53bf8a3c f3ff6a22 27340029 c732ebd9 a2aaf209 858abd90 8269a8ce 197b06b5 2fee72c8 33780ab5 948ba385 2199db28 204ae9be 8bfcba95 45277c97 5af85b47 2036b662 83333333 00
 
         public static byte[] SerializeCoinbase(IJob job, UInt32 extraNonce1, UInt32 extraNonce2)
         {

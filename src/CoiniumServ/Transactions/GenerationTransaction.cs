@@ -156,14 +156,7 @@ namespace CoiniumServ.Transactions
             var coinbaseTxData = BlockTemplate.Transactions[0].Data;
             var placeholderPos = coinbaseTxData.IndexOf(originalSignatireScriptHex) + originalSignatireScriptHex.Length;
 
-            _logger.Information("Orig tx: {0}", coinbaseTxData);
-            _logger.Information("Orig tx script sig: {0}", originalSignatireScriptHex);
-
             string[] tokens = coinbaseTxData.Split(new[] { originalSignatireScriptHex }, StringSplitOptions.None);
-
-            _logger.Information("Orig Coinbase initial: {0}", tokens[0]);
-            _logger.Information("Orig Coinbase final: {0}", tokens[1]);
-            _logger.Information("ExtraNonce.ExtraNoncePlaceholder: {0}", ExtraNonce.ExtraNoncePlaceholder.ToHexString());
 
             // create the first part.
             using (var stream = new MemoryStream())
@@ -192,9 +185,6 @@ namespace CoiniumServ.Transactions
 
                 Final = stream.ToArray();
             }
-
-            _logger.Information("New Coinbase initial: {0}", Initial.ToHexString());
-            _logger.Information("New Coinbase final: {0}", Final.ToHexString());
         }
     }
 }

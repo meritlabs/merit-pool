@@ -42,6 +42,7 @@ using CoiniumServ.Utils.Extensions;
 using CoiniumServ.Utils.Helpers;
 using CoiniumServ.Utils.Numerics;
 using Gibbed.IO;
+using Serilog;
 
 namespace CoiniumServ.Jobs
 {

@@ -168,10 +168,6 @@ namespace CoiniumServ.Jobs.Manager
                 var generationTransaction = new GenerationTransaction(ExtraNonce, blockTemplate, _poolConfig);
                 generationTransaction.Create();
 
-                _logger.Information("New prevblockhash: {0}", blockTemplate.PreviousBlockHash);
-                _logger.Information("New prevblockhash reversed: {0}", blockTemplate.PreviousBlockHash.HexToByteArray().ReverseByteOrder().ToHexString());
-                _logger.Information("New prevblockhash reversed twice: {0}", blockTemplate.PreviousBlockHash.HexToByteArray().ReverseByteOrder().ToHexString().HexToByteArray().ReverseByteOrder().ToHexString());
-
                 // create the job notification.
                 var job = new Job(_jobCounter.Next(), _hashAlgorithm, blockTemplate, generationTransaction)
                 {

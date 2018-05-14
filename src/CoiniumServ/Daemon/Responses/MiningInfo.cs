@@ -45,6 +45,8 @@ namespace CoiniumServ.Daemon.Responses
         [JsonConverter(typeof(DifficultyConverter))]
         public double Difficulty { get; set; }
 
+        public uint DifficultyEdgeBits { get; set; }
+
         public string Errors { get; set; }
 
         public bool Generate { get; set; }

@@ -177,7 +177,7 @@ namespace CoiniumServ.Pools
             try
             {
                 HashAlgorithm = _objectFactory.GetHashAlgorithm(Config.Coin);
-                _shareMultiplier = Math.Pow(2, 32) / HashAlgorithm.Multiplier; // will be used in hashrate calculation.
+                _shareMultiplier = Math.Pow(2, 10) / HashAlgorithm.Multiplier; // will be used in hashrate calculation.
                 return true;
             }
             catch (TinyIoCResolutionException)
@@ -322,6 +322,9 @@ namespace CoiniumServ.Pools
 
             double total = hashrates.Sum(pair => pair.Value);
             Hashrate = Convert.ToUInt64(_shareMultiplier * total / _configManager.StatisticsConfig.HashrateWindow);
+
+            // TODO: fix pool hashrate calculation
+            _logger.Debug("Pool hashrate window: {0} total: {1} hashrate: {2:0.000000000}", _configManager.StatisticsConfig.HashrateWindow, total, Hashrate);
         }
     }
 }

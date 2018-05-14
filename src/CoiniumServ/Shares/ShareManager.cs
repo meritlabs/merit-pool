@@ -185,15 +185,12 @@ namespace CoiniumServ.Shares
         private bool SubmitBlock(IShare share)
         {
             // TODO: we should try different submission techniques and probably more then once: https://github.com/ahmedbodi/stratum-mining/blob/master/lib/bitcoin_rpc.py#L65-123
-            _logger.Information("Share: {0}", share.BlockHex.ToHexString());
             try
             {
                 if (_poolConfig.Coin.Options.SubmitBlockSupported) // see if submitblock() is available.
                     _daemonClient.SubmitBlock(share.BlockHex.ToHexString()); // submit the block.
                 else
                     _daemonClient.GetBlockTemplate(share.BlockHex.ToHexString(), _poolConfig.Wallet.Address); // use getblocktemplate() if submitblock() is not supported.
-
-                _logger.Debug("Getting share block [{0}]", share.BlockHash.ToHexString());
 
                 var block = _daemonClient.GetBlock(share.BlockHash.ToHexString()); // query the block.
 

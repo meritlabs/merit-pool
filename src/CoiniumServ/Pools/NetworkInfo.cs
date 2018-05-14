@@ -41,6 +41,8 @@ namespace CoiniumServ.Pools
     {
         public double Difficulty { get; private set; }
 
+        public double DifficultyEdgeBits { get; private set; }
+
         public int Round { get; private set; }
 
         public double Hashrate { get; private set; }
@@ -149,6 +151,7 @@ namespace CoiniumServ.Pools
                 // read data.
                 Hashrate = miningInfo.NetworkHashPerSec;
                 Difficulty = miningInfo.Difficulty;
+                DifficultyEdgeBits = miningInfo.DifficultyEdgeBits;
                 Round = miningInfo.Blocks + 1;
                 if (!Testnet)
                     Testnet = miningInfo.Chain == "test";
@@ -158,6 +161,7 @@ namespace CoiniumServ.Pools
                 _logger.Error("Can not read getmininginfo(): {0:l}", e.Message);
                 Hashrate = 0;
                 Difficulty = 0;
+                DifficultyEdgeBits = 0;
                 Round = -1;
                 Healthy = false; // set healthy status to false as we couldn't get a reply.
             }
@@ -178,14 +182,15 @@ namespace CoiniumServ.Pools
         {
             _logger.Information("symbol: {0:l} algorithm: {1:l} " +
                                 "version: {2:l} protocol: {3} wallet: {4} " +
-                                "network difficulty: {5:0.00000000} block difficulty: {6:0.00} network hashrate: {7:l} " +
-                                "network: {8:l} peers: {9} blocks: {10} errors: {11:l} ",
+                                "network difficulty: {5:0.00000000000} edgebits: {6} block difficulty: {7:0.00000000000} network hashrate: {8:l} " +
+                                "network: {9:l} peers: {10} blocks: {11} errors: {12:l} ",
                 _poolConfig.Coin.Symbol,
                 _poolConfig.Coin.Algorithm,
                 CoinVersion,
                 ProtocolVersion,
                 WalletVersion,
                 Difficulty,
+                DifficultyEdgeBits,
                 Difficulty * _hashAlgorithm.Multiplier,
                 Hashrate.GetReadableHashrate(),
                 Testnet ? "testnet" : "mainnet",
