@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,11 +24,12 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System.Diagnostics;
 using System.Linq;
+using CoiniumServ.Coin.Address.Exceptions;
 using CoiniumServ.Daemon;
 using CoiniumServ.Daemon.Errors;
 using CoiniumServ.Daemon.Exceptions;
@@ -111,7 +112,7 @@ namespace CoiniumServ.Blocks
         {
             var blockInfo = GetBlockInfo(block); // query the block.
 
-            if (blockInfo == null) // make sure we got a valid blockInfo response before continuing on 
+            if (blockInfo == null) // make sure we got a valid blockInfo response before continuing on
                 return; // in case we have a null, status will be already decided by GetBlockInfo() function.
 
             if (blockInfo.Confirmations == -1) // check if block is orphaned already.
@@ -138,7 +139,7 @@ namespace CoiniumServ.Blocks
                 return; // in case we have a null, status will be already decided by GetGenerationTx() function.
 
             // get the output transaction that targets pools central wallet.
-            var poolOutput = genTx.GetPoolOutput(_poolConfig.Wallet.Adress, _poolAccount);
+            var poolOutput = genTx.GetPoolOutput(_poolConfig.Wallet.Address, _poolAccount);
 
             // make sure we have a valid reference to poolOutput
             if (poolOutput == null)
@@ -232,7 +233,7 @@ namespace CoiniumServ.Blocks
 
                 // if we got an error that we do not handle
                 else
-                {                    
+                {
                     block.Status = BlockStatus.Pending; // let the block in pending status so we can query it again later.
                     _logger.Error("Unhandled rpc-error: {0:l}", e.Message);
                 }
@@ -251,13 +252,17 @@ namespace CoiniumServ.Blocks
         {
             try
             {
-                _poolAccount = !_poolConfig.Coin.Options.UseDefaultAccount // if UseDefaultAccount is not set
-                    ? _daemonClient.GetAccount(_poolConfig.Wallet.Adress) // find the account of the our pool address.
-                    : ""; // use the default account.
+                var res = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address); // use the default account.
+
+                if (!res.IsValid || !res.IsConfirmed) {
+                    throw new InvalidWalletAddressException(_poolConfig.Wallet.Address);
+                }
+
+                _poolAccount = res.Address;
             }
             catch (RpcException e)
             {
-                _logger.Error("Error getting account for pool central wallet address: {0:l} - {1:l}", _poolConfig.Wallet.Adress, e.Message);
+                _logger.Error("Error getting account for pool central wallet address: {0:l} - {1:l}", _poolConfig.Wallet.Address, e.Message);
             }
         }
     }

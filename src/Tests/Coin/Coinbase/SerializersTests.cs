@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -46,11 +46,11 @@ using NSubstitute;
 using Should.Fluent;
 using Xunit;
 
-/* 
+/*
     Sample data:
     -- create-generation start --
     rpcData: {"version":2,"previousblockhash":"1c4eb88e47564cb796b5c6648c74bec51d7215ac12fc4168b14827aac74a8062","transactions":[{"data":"010000000332a82e92f522deee69b09e27858ba9b87585f2a4913ef71018df40909032fdc3000000006a473044022019ca05cb880a04f0d842268b7e75ac6d2695fc544df033e3daeb29239251a8970220031f6336767f2ea617347484e1290ec0bdcc71056ea2d3084e75384905250ec50121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffff086747cbd339b21b950774186091653a7b8f5751b00a906ff6f5561b3a6fcee6010000006b4830450221009ae1ba9a216d313cc592fc2c1ef08f1e0e555a32b6c1b305f685ac882d38356b0220243106bbb5bb76dde142e574cba8f30c1e2f7059e8e9161770396fbd2b50420f0121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffffe2f15804b1e41c36c925c6f64f219b2bdb3c9fbff4c97a4f0e8c7f31d7e6f2af000000006b48304502200be8894fdd7f5c19be248a979c08bbf2395f606e038c3e02c0266474c03699ab022100ff5de87086e487410f5d7b68012655ca6d814f0caeb9ca42d9c425a90f68b3030121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffff02a0f01900000000001976a9141c50209a1dfdf53313d237b75e9aeb553ca1dfda88ac00e1f505000000001976a914cbb9a3e7a7c1651b1006f876f08b40be85b274f588ac00000000","hash":"dc3a80ec6c45aa489453b2c4abf6761eb6656d949e26d01793458c166640e5f3","depends":[],"fee":0,"sigops":2}],"coinbaseaux":{"flags":"062f503253482f"},"coinbasevalue":5000000000,"target":"00000048d4f70000000000000000000000000000000000000000000000000000","mintime":1403691059,"mutable":["time","transactions","prevblock"],"noncerange":"00000000ffffffff","sigoplimit":20000,"sizelimit":1000000,"curtime":1403691825,"bits":"1d48d4f7","height":315152}
-             
+
     -- scriptSigPart data --
     -> height: 315152 serialized: 0310cf04
     -> coinbase: 062f503253482f hex: 062f503253482f
@@ -77,11 +77,11 @@ using Xunit;
     txInSequence: 0 packUInt32LE: 00000000
     outputTransactions: 0280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac
     txLockTime: 0 packUInt32LE: 00000000
-    txComment: 
+    txComment:
     p2: 0d2f6e6f64655374726174756d2f000000000280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac00000000
 
     getJobParams: ["2","c74a8062b14827aa12fc41681d7215ac8c74bec596b5c66447564cb71c4eb88e","01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff270310cf04062f503253482f0430a3aa5308","0d2f6e6f64655374726174756d2f000000000280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac00000000",["f3e54066168c459317d0269e946d65b61e76f6abc4b2539448aa456cec803adc"],"00000002","1d48d4f7","53aaa331",true]
- 
+
     handleSubmit: {"params":["mn4jUMneEBjZuDPEdFuj6BmFPmehmrT2Zc","2","07000000","53aaa331","44725000"],"id":120,"method":"mining.submit"}
 
     processShare: jobId: 2 previousDifficulty: undefined difficulty: 32 extraNonce1: 58000000 extraNonce2: 07000000 nTime: 53aaa331 nonce		: 44725000 ipAddress: 10.0.0.40 port: 3333 workerName: mn4jUMneEBjZuDPEdFuj6BmFPmehmrT2Zc
@@ -174,13 +174,11 @@ namespace CoiniumServ.Tests.Coin.Coinbase
             poolConfig.Wallet.Returns(walletConfig);
 
             // create sample pool central wallet output.
-            walletConfig.Adress.Returns("mk8JqN1kNWju8o3DXEijiJyn7iqkwktAWq");
-            _outputs.AddPoolWallet(walletConfig.Adress, blockReward);
-                                   
+            walletConfig.Address.Returns("mk8JqN1kNWju8o3DXEijiJyn7iqkwktAWq");
+            _outputs.AddPoolWallet(walletConfig.Address, blockReward);
+
             // generation transaction.
             _generationTransaction = Substitute.For<GenerationTransaction>(_extraNonce, _daemonClient, _blockTemplate, poolConfig);
-            _generationTransaction.Inputs.First().SignatureScript = _signatureScript;
-            _generationTransaction.Outputs = _outputs;
             _generationTransaction.Create();
 
             // job counter
@@ -245,7 +243,7 @@ namespace CoiniumServ.Tests.Coin.Coinbase
             var header = Serializers.SerializeHeader(_job, merkleRoot, nTime, nonce);
 
             // create the block hex
-            var blockHex = Serializers.SerializeBlock(_job, header, coinbase);
+            var blockHex = Serializers.SerializeBlock(_job, header, coinbase, new byte[]{});
 
             // test the block hex
             blockHex.ToHexString().Should().Equal("0100000062804ac7aa2748b16841fc12ac15721dc5be748c64c6b596b74c56478eb84e1c1732a2242d83c6b1a935eecec4c48e56a10b0977f723456331f6b2ff5efb757831a3aa53f7d4481d005072440201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff270310cf04062f503253482f0430a3aa530858000000070000000d2f6e6f64655374726174756d2f000000000280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac00000000010000000332a82e92f522deee69b09e27858ba9b87585f2a4913ef71018df40909032fdc3000000006a473044022019ca05cb880a04f0d842268b7e75ac6d2695fc544df033e3daeb29239251a8970220031f6336767f2ea617347484e1290ec0bdcc71056ea2d3084e75384905250ec50121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffff086747cbd339b21b950774186091653a7b8f5751b00a906ff6f5561b3a6fcee6010000006b4830450221009ae1ba9a216d313cc592fc2c1ef08f1e0e555a32b6c1b305f685ac882d38356b0220243106bbb5bb76dde142e574cba8f30c1e2f7059e8e9161770396fbd2b50420f0121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffffe2f15804b1e41c36c925c6f64f219b2bdb3c9fbff4c97a4f0e8c7f31d7e6f2af000000006b48304502200be8894fdd7f5c19be248a979c08bbf2395f606e038c3e02c0266474c03699ab022100ff5de87086e487410f5d7b68012655ca6d814f0caeb9ca42d9c425a90f68b3030121030dd394118fb66ca288bff71d8ea762678783b005770f7f9ba4128233191e0847ffffffff02a0f01900000000001976a9141c50209a1dfdf53313d237b75e9aeb553ca1dfda88ac00e1f505000000001976a914cbb9a3e7a7c1651b1006f876f08b40be85b274f588ac00000000");

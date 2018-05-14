@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -38,8 +38,10 @@ using CoiniumServ.Daemon.Responses;
 using CoiniumServ.Jobs;
 using CoiniumServ.Pools;
 using CoiniumServ.Transactions.Script;
+using CoiniumServ.Utils.Extensions;
 using CoiniumServ.Utils.Helpers;
 using Gibbed.IO;
+using Serilog;
 
 namespace CoiniumServ.Transactions
 {
@@ -67,23 +69,11 @@ namespace CoiniumServ.Transactions
         /// </summary>
         public UInt32 Version { get; private set; }
 
-        /// <summary>
-        /// Number of Transaction inputs
-        /// </summary>
-        public UInt32 InputsCount
-        {
-            get { return (UInt32)Inputs.Count; } 
-        }
 
         /// <summary>
-        /// A list of 1 or more transaction inputs or sources for coins
+        /// Coinbase tx signature script
         /// </summary>
-        public List<TxIn> Inputs { get; private set; } 
-
-        /// <summary>
-        /// A list of 1 or more transaction outputs or destinations for coins
-        /// </summary>
-        public IOutputs Outputs { get; set; }
+        public SignatureScript CoinbaseSignatureScript { get; private set; }
 
         /// <summary>
         ///  For coins that support/require transaction comments
@@ -108,19 +98,19 @@ namespace CoiniumServ.Transactions
         /// </summary>
         public byte[] Final { get; private set; }
 
-        public IDaemonClient DaemonClient { get; private set; }
-
         public IBlockTemplate BlockTemplate { get; private set; }
 
         public IExtraNonce ExtraNonce { get; private set; }
 
         public IPoolConfig PoolConfig { get; private set; }
 
+        private readonly ILogger _logger;
+
+
         /// <summary>
         /// Creates a new instance of generation transaction.
         /// </summary>
         /// <param name="extraNonce">The extra nonce.</param>
-        /// <param name="daemonClient">The daemon client.</param>
         /// <param name="blockTemplate">The block template.</param>
         /// <param name="poolConfig">The associated pool's configuration</param>
         /// <remarks>
@@ -128,10 +118,9 @@ namespace CoiniumServ.Transactions
         /// https://github.com/zone117x/node-stratum-pool/blob/b24151729d77e0439e092fe3a1cdbba71ca5d12e/lib/transactions.js
         /// https://github.com/Crypto-Expert/stratum-mining/blob/master/lib/coinbasetx.py
         /// </remarks>
-        public GenerationTransaction(IExtraNonce extraNonce, IDaemonClient daemonClient, IBlockTemplate blockTemplate, IPoolConfig poolConfig)
+        public GenerationTransaction(IExtraNonce extraNonce, IBlockTemplate blockTemplate, IPoolConfig poolConfig)
         {
-            // TODO: we need a whole refactoring here.
-            // we should use DI and it shouldn't really require daemonClient connection to function.
+            _logger = Log.ForContext<GenerationTransaction>();
 
             BlockTemplate = blockTemplate;
             ExtraNonce = extraNonce;
@@ -141,65 +130,42 @@ namespace CoiniumServ.Transactions
             TxMessage = Serializers.SerializeString(poolConfig.Meta.TxMessage);
             LockTime = 0;
 
-            // transaction inputs
-            Inputs = new List<TxIn>
-            {
-                new TxIn
-                {
-                    PreviousOutput = new OutPoint
-                    {
-                        Hash = Hash.ZeroHash,
-                        Index = (UInt32) Math.Pow(2, 32) - 1
-                    },
-                    Sequence = 0x0,
-                    SignatureScript =
-                        new SignatureScript(
-                            blockTemplate.Height,
-                            blockTemplate.CoinBaseAux.Flags,
-                            TimeHelpers.NowInUnixTimestamp(),
-                            (byte) extraNonce.ExtraNoncePlaceholder.Length,
-                            "/CoiniumServ/")
-                }
-            }; 
+            CoinbaseSignatureScript =
+                new SignatureScript(
+                    blockTemplate.Height,
+                    blockTemplate.CoinBaseAux.Flags,
+                    TimeHelpers.NowInUnixTimestamp(),
+                    (byte) extraNonce.ExtraNoncePlaceholder.Length,
+                    "/MeritPool/");
 
-            // transaction outputs
-            Outputs = new Outputs(daemonClient, poolConfig.Coin);
-
-            double blockReward = BlockTemplate.Coinbasevalue; // the amount rewarded by the block.
-
-            // generate output transactions for recipients (set in config).
-            foreach (var pair in poolConfig.Rewards)
-            {
-                var amount = blockReward * pair.Value / 100; // calculate the amount he recieves based on the percent of his shares.
-                blockReward -= amount;
-
-                Outputs.AddRecipient(pair.Key, amount);
-            }
-
-            // send the remaining coins to pool's central wallet.
-            Outputs.AddPoolWallet(poolConfig.Wallet.Adress, blockReward); 
         }
 
         public void Create()
         {
+            string originalSignatireScriptHex;
+            using (var stream = new MemoryStream())
+            {
+                var heightBytes = Serializers.SerializeNumber(BlockTemplate.Height);
+                stream.WriteByte((byte) (heightBytes.Length + 1));
+                stream.WriteBytes(heightBytes);
+                stream.WriteByte(0);
+
+                originalSignatireScriptHex = stream.ToArray().ToHexString();
+            }
+
+            var coinbaseTxData = BlockTemplate.Transactions[0].Data;
+            var placeholderPos = coinbaseTxData.IndexOf(originalSignatireScriptHex) + originalSignatireScriptHex.Length;
+
+            string[] tokens = coinbaseTxData.Split(new[] { originalSignatireScriptHex }, StringSplitOptions.None);
+
             // create the first part.
             using (var stream = new MemoryStream())
             {
-                stream.WriteValueU32(Version.LittleEndian()); // write version
-
-                if(PoolConfig.Coin.Options.IsProofOfStakeHybrid) // if coin is a proof-of-stake coin
-                    stream.WriteValueU32(BlockTemplate.CurTime); // include time-stamp in the transaction.
-
-                // write transaction input.
-                stream.WriteBytes(Serializers.VarInt(InputsCount));
-                stream.WriteBytes(Inputs.First().PreviousOutput.Hash.Bytes);
-                stream.WriteValueU32(Inputs.First().PreviousOutput.Index.LittleEndian());
-
-                // write signature script lenght
-                var signatureScriptLenght = (UInt32)(Inputs.First().SignatureScript.Initial.Length + ExtraNonce.ExtraNoncePlaceholder.Length + Inputs.First().SignatureScript.Final.Length);
+                stream.WriteBytes(tokens[0].HexToByteArray()); // write version
+                // write signature
+                var signatureScriptLenght = (UInt32)(CoinbaseSignatureScript.Initial.Length + ExtraNonce.ExtraNoncePlaceholder.Length + CoinbaseSignatureScript.Final.Length);
                 stream.WriteBytes(Serializers.VarInt(signatureScriptLenght).ToArray());
-
-                stream.WriteBytes(Inputs.First().SignatureScript.Initial);
+                stream.WriteBytes(CoinbaseSignatureScript.Initial);
 
                 Initial = stream.ToArray();
             }
@@ -211,17 +177,8 @@ namespace CoiniumServ.Transactions
             // create the second part.
             using (var stream = new MemoryStream())
             {
-                // transaction input
-                stream.WriteBytes(Inputs.First().SignatureScript.Final);
-                stream.WriteValueU32(Inputs.First().Sequence); 
-                // transaction inputs end here.
-
-                // transaction output
-                var outputBuffer = Outputs.GetBuffer();
-                stream.WriteBytes(outputBuffer); 
-                // transaction output ends here.
-
-                stream.WriteValueU32(LockTime.LittleEndian());
+                stream.WriteBytes(CoinbaseSignatureScript.Final);
+                stream.WriteBytes(tokens[1].HexToByteArray());
 
                 if (PoolConfig.Coin.Options.TxMessageSupported)
                     stream.WriteBytes(TxMessage);
@@ -229,5 +186,5 @@ namespace CoiniumServ.Transactions
                 Final = stream.ToArray();
             }
         }
-    }    
+    }
 }

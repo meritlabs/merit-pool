@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using AustinHarris.JsonRpc;
@@ -57,7 +57,7 @@ namespace CoiniumServ.Server.Mining.Stratum
         [JsonRpcMethod("mining.subscribe")]
         public SubscribeResponse SubscribeMiner(string signature = null, string sessionId = null)
         {
-            var context = (StratumContext) JsonRpcContext.Current().Value;         
+            var context = (StratumContext) JsonRpcContext.Current().Value;
 
             var response = new SubscribeResponse
             {
@@ -83,18 +83,19 @@ namespace CoiniumServ.Server.Mining.Stratum
         }
 
         /// <summary>
-        /// Allows a miner to submit the work they have done 
+        /// Allows a miner to submit the work they have done
         /// </summary>
         /// <param name="user">Worker Username.</param>
         /// <param name="jobId">Job ID(Should be unique per Job to ensure that share diff is recorded properly) </param>
         /// <param name="extraNonce2">Hex-encoded big-endian extranonce2, length depends on extranonce2_size from mining.notify</param>
         /// <param name="nTime"> UNIX timestamp (32bit integer, big-endian, hex-encoded), must be >= ntime provided by mining,notify and <= current time'</param>
         /// <param name="nonce"> 32bit integer hex-encoded, big-endian </param>
+        /// <param name="cycle"> comma separated cycle edges in hex </param>
         [JsonRpcMethod("mining.submit")]
-        public bool SubmitWork(string user, string jobId, string extraNonce2, string nTime, string nonce)
+        public bool SubmitWork(string user, string jobId, string extraNonce2, string nTime, string nonce, string cycle)
         {
             var context = (StratumContext)JsonRpcContext.Current().Value;
-            return _shareManager.ProcessShare(context.Miner, jobId, extraNonce2, nTime, nonce).IsValid;
+            return _shareManager.ProcessShare(context.Miner, jobId, extraNonce2, nTime, nonce, cycle).IsValid;
         }
     }
 }

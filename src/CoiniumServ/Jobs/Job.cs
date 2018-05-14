@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -42,6 +42,7 @@ using CoiniumServ.Utils.Extensions;
 using CoiniumServ.Utils.Helpers;
 using CoiniumServ.Utils.Numerics;
 using Gibbed.IO;
+using Serilog;
 
 namespace CoiniumServ.Jobs
 {
@@ -81,6 +82,8 @@ namespace CoiniumServ.Jobs
 
         public IMerkleTree MerkleTree { get; private set; }
 
+        public byte EdgeBits { get; private set; }
+
         /// <summary>
         /// List of shares submitted by miners in order to determine duplicate shares.
         /// </summary>
@@ -106,12 +109,17 @@ namespace CoiniumServ.Jobs
             CoinbaseInitial = generationTransaction.Initial.ToHexString();
             CoinbaseFinal = generationTransaction.Final.ToHexString();
             CreationTime = TimeHelpers.NowInUnixTimestamp();
+            EdgeBits = blockTemplate.EdgeBits;
 
             _shares = new List<UInt64>();
 
             // calculate the merkle tree
-            MerkleTree = new MerkleTree(BlockTemplate.Transactions.GetHashList());
-        
+            var hashes = BlockTemplate.Transactions.Slice(1, BlockTemplate.Transactions.Length).GetHashList();
+            hashes.AddRange(BlockTemplate.Invites.GetHashList());
+            hashes.AddRange(BlockTemplate.Referrals.GetHashList());
+
+            MerkleTree = new MerkleTree(hashes);
+
             // set version
             Version = BitConverter.GetBytes(blockTemplate.Version.BigEndian()).ToHexString();
 
@@ -141,6 +149,7 @@ namespace CoiniumServ.Jobs
                 MerkleTree.Branches,
                 Version,
                 EncodedDifficulty,
+                EdgeBits,
                 NTime,
                 CleanJobs
             };

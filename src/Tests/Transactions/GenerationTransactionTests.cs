@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -73,7 +73,7 @@ using Xunit;
     txInSequence: 0 packUInt32LE: 00000000
     outputTransactions: 0280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac
     txLockTime: 0 packUInt32LE: 00000000
-    txComment: 
+    txComment:
     p2: 0d2f6e6f64655374726174756d2f000000000280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac00000000
 */
 
@@ -129,7 +129,7 @@ namespace CoiniumServ.Tests.Transactions
 
             // create rewards config.
             var rewardsConfig = Substitute.For<IRewardsConfig>();
-            _poolConfig.Rewards.Returns(rewardsConfig);            
+            _poolConfig.Rewards.Returns(rewardsConfig);
 
             // create sample reward
             var amount = blockReward * 0.01;
@@ -147,19 +147,15 @@ namespace CoiniumServ.Tests.Transactions
             _poolConfig.Wallet.Returns(walletConfig);
 
             // create sample pool central wallet output.
-            walletConfig.Adress.Returns("mk8JqN1kNWju8o3DXEijiJyn7iqkwktAWq");
-            _outputs.AddPoolWallet(walletConfig.Adress, blockReward);            
+            walletConfig.Address.Returns("mk8JqN1kNWju8o3DXEijiJyn7iqkwktAWq");
+            _outputs.AddPoolWallet(walletConfig.Address, blockReward);
         }
 
         [Fact]
         public void CreateGenerationTransactionTest()
         {
             // create the test object.
-            var generationTransaction = new GenerationTransaction(_extraNonce, _daemonClient, _blockTemplate, _poolConfig);
-
-            // use the exactly same input script data within our sample data.
-            generationTransaction.Inputs.First().SignatureScript = _signatureScript;
-            generationTransaction.Outputs = _outputs;
+            var generationTransaction = new GenerationTransaction(_extraNonce, _blockTemplate, _poolConfig);
 
             // create the transaction
             generationTransaction.Create();
@@ -167,33 +163,6 @@ namespace CoiniumServ.Tests.Transactions
             // test version.
             generationTransaction.Version.Should().Equal((UInt32)2);
             generationTransaction.Initial.Take(4).ToHexString().Should().Equal("02000000");
-
-            // test inputs count.
-            generationTransaction.InputsCount.Should().Equal((UInt32)1);
-            generationTransaction.Initial.Skip(4).Take(1).Should().Equal(new byte[] { 0x01 }); 
-
-            // test the input previous-output hash
-            generationTransaction.Initial.Skip(5).Take(32).ToHexString().Should().Equal("0000000000000000000000000000000000000000000000000000000000000000");
-
-            // test the input previous-output index
-            generationTransaction.Inputs.First().PreviousOutput.Index.Should().Equal(0xffffffff);
-            generationTransaction.Initial.Skip(37).Take(4).ToHexString().Should().Equal("ffffffff");
-
-            // test the lenghts byte
-            generationTransaction.Inputs.First().SignatureScript.Initial.Length.Should().Equal(17);
-            _extraNonce.ExtraNoncePlaceholder.Length.Should().Equal(8);
-            generationTransaction.Inputs.First().SignatureScript.Final.Length.Should().Equal(14);
-            generationTransaction.Initial.Skip(41).Take(1).ToHexString().Should().Equal("27");
-
-            // test the signature script initial
-            generationTransaction.Initial.Skip(42).Take(17).ToHexString().Should().Equal("03be9d04062f503253482f04c3e89a5308");
-            
-            // test the signature script final
-            generationTransaction.Final.Take(14).ToHexString().Should().Equal("0d2f6e6f64655374726174756d2f");
-
-            // test the inputs sequence
-            generationTransaction.Inputs.First().Sequence.Should().Equal((UInt32)0x00);
-            generationTransaction.Final.Skip(14).Take(4).ToHexString().Should().Equal("00000000");
 
             // test the outputs buffer
             generationTransaction.Final.Skip(18).Take(69).ToHexString().Should().Equal("0280010b27010000001976a914329035234168b8da5af106ceb20560401236849888ac80f0fa02000000001976a9147d576fbfca48b899dc750167dd2a2a6572fff49588ac");

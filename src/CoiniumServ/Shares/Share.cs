@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,10 +24,11 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
+using System.IO;
 using CoiniumServ.Algorithms;
 using CoiniumServ.Coin.Coinbase;
 using CoiniumServ.Cryptology;
@@ -38,6 +39,8 @@ using CoiniumServ.Server.Mining.Stratum;
 using CoiniumServ.Utils.Extensions;
 using CoiniumServ.Utils.Helpers;
 using CoiniumServ.Utils.Numerics;
+using Gibbed.IO;
+using Serilog;
 
 namespace CoiniumServ.Shares
 {
@@ -63,17 +66,22 @@ namespace CoiniumServ.Shares
         public byte[] HeaderBuffer { get; private set; }
         public byte[] HeaderHash { get; private set; }
         public BigInteger HeaderValue { get; private set; }
+        public byte[] CycleBuffer { get; private set; }
+        public byte[] CycleHash { get; private set; }
+        public BigInteger CycleValue { get; private set; }
         public Double Difficulty { get; private set; }
         public double BlockDiffAdjusted { get; private set; }
         public byte[] BlockHex { get; private set; }
         public byte[] BlockHash { get; private set; }
+        public UInt32[] Cycle { get; private set; }
 
-        public Share(IStratumMiner miner, UInt64 jobId, IJob job, string extraNonce2, string nTimeString, string nonceString)
+        public Share(IStratumMiner miner, UInt64 jobId, IJob job, string extraNonce2, string nTimeString, string nonceString, UInt32[] cycle)
         {
             Miner = miner;
             JobId = jobId;
             Job = job;
             Error = ShareError.None;
+            Cycle = cycle;
 
             var submitTime = TimeHelpers.NowInUnixTimestamp(); // time we recieved the share from miner.
 
@@ -90,7 +98,7 @@ namespace CoiniumServ.Shares
                 return;
             }
             ExtraNonce2 = Convert.ToUInt32(extraNonce2, 16); // set extraNonce2 for the share.
-            
+
             // check size of miner supplied nTime.
             if (nTimeString.Length != 8)
             {
@@ -98,7 +106,7 @@ namespace CoiniumServ.Shares
                 return;
             }
             NTime = Convert.ToUInt32(nTimeString, 16); // read ntime for the share
-            
+
             // make sure NTime is within range.
             if (NTime < job.BlockTemplate.CurTime || NTime > submitTime + 7200)
             {
@@ -126,7 +134,7 @@ namespace CoiniumServ.Shares
             }
 
             // construct the coinbase.
-            CoinbaseBuffer = Serializers.SerializeCoinbase(Job, ExtraNonce1, ExtraNonce2); 
+            CoinbaseBuffer = Serializers.SerializeCoinbase(Job, ExtraNonce1, ExtraNonce2);
             CoinbaseHash = Coin.Coinbase.Utils.HashCoinbase(CoinbaseBuffer);
 
             // create the merkle root.
@@ -136,24 +144,36 @@ namespace CoiniumServ.Shares
             HeaderBuffer = Serializers.SerializeHeader(Job, MerkleRoot, NTime, Nonce);
             HeaderHash = Job.HashAlgorithm.Hash(HeaderBuffer);
             HeaderValue = new BigInteger(HeaderHash);
+            BlockHash = HeaderBuffer.DoubleDigest().ReverseBuffer();
+
+            using (var stream = new MemoryStream())
+            {
+                stream.WriteByte((byte) Cycle.Length);
+                foreach (var edge in Cycle) {
+                    stream.WriteValueU32(edge);
+                }
+
+                CycleBuffer = stream.ToArray();
+            }
+
+            CycleHash = Job.HashAlgorithm.Hash(CycleBuffer);
+            CycleValue = new BigInteger(CycleHash);
 
             // calculate the share difficulty
-            Difficulty = ((double)new BigRational(AlgorithmManager.Diff1, HeaderValue)) * Job.HashAlgorithm.Multiplier;
+            Difficulty = ((double)new BigRational(AlgorithmManager.Diff1, CycleValue)) * Job.HashAlgorithm.Multiplier;
 
             // calculate the block difficulty
             BlockDiffAdjusted = Job.Difficulty * Job.HashAlgorithm.Multiplier;
 
             // check if block candicate
-            if (Job.Target >= HeaderValue)
+            if (Job.Target >= CycleValue)
             {
                 IsBlockCandidate = true;
-                BlockHex = Serializers.SerializeBlock(Job, HeaderBuffer, CoinbaseBuffer, miner.Pool.Config.Coin.Options.IsProofOfStakeHybrid);
-                BlockHash = HeaderBuffer.DoubleDigest().ReverseBuffer();
+                BlockHex = Serializers.SerializeBlock(Job, HeaderBuffer, CoinbaseBuffer, CycleBuffer, miner.Pool.Config.Coin.Options.IsProofOfStakeHybrid);
             }
             else
             {
                 IsBlockCandidate = false;
-                BlockHash = HeaderBuffer.DoubleDigest().ReverseBuffer();
 
                 // Check if share difficulty reaches miner difficulty.
                 var lowDifficulty = Difficulty/miner.Difficulty < 0.99; // share difficulty should be equal or more then miner's target difficulty.
@@ -164,7 +184,7 @@ namespace CoiniumServ.Shares
                 if (Difficulty >= miner.PreviousDifficulty) // if the difficulty matches miner's previous difficulty before the last vardiff triggered difficulty change
                     return; // still accept the share.
 
-                // if the share difficulty can't match miner's current difficulty or previous difficulty                
+                // if the share difficulty can't match miner's current difficulty or previous difficulty
                 Error = ShareError.LowDifficultyShare; // then just reject the share with low difficult share error.
             }
         }

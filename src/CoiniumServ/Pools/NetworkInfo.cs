@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -40,6 +40,8 @@ namespace CoiniumServ.Pools
     public class NetworkInfo : INetworkInfo
     {
         public double Difficulty { get; private set; }
+
+        public double DifficultyEdgeBits { get; private set; }
 
         public int Round { get; private set; }
 
@@ -117,7 +119,7 @@ namespace CoiniumServ.Pools
             catch (RpcException) // catch exception, provide backwards compatability for getinfo() based data.
             {
                 // do not log this as an actual error, but rather as info only, then proceed to try getinfo().
-                //_logger.Error("Can not read getnetworkinfo(), trying getinfo() instead: {0:l}", c.Message); // do not log original error, try getinfo() first.   
+                //_logger.Error("Can not read getnetworkinfo(), trying getinfo() instead: {0:l}", c.Message); // do not log original error, try getinfo() first.
 
                 try // catch exception, provide backwards compatability for getinfo() based data.
                 {
@@ -149,22 +151,24 @@ namespace CoiniumServ.Pools
                 // read data.
                 Hashrate = miningInfo.NetworkHashPerSec;
                 Difficulty = miningInfo.Difficulty;
+                DifficultyEdgeBits = miningInfo.DifficultyEdgeBits;
                 Round = miningInfo.Blocks + 1;
                 if (!Testnet)
-                    Testnet = miningInfo.Testnet;
+                    Testnet = miningInfo.Chain == "test";
             }
             catch (RpcException e)
             {
                 _logger.Error("Can not read getmininginfo(): {0:l}", e.Message);
                 Hashrate = 0;
                 Difficulty = 0;
+                DifficultyEdgeBits = 0;
                 Round = -1;
                 Healthy = false; // set healthy status to false as we couldn't get a reply.
             }
 
             try // read getblocktemplate() based data.
             {
-                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired);
+                var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired, _poolConfig.Wallet.Address);
                 Reward = (UInt64)blockTemplate.Coinbasevalue / 100000000; // coinbasevalue is in satoshis, convert it to actual coins.
             }
             catch (RpcException e)
@@ -178,14 +182,15 @@ namespace CoiniumServ.Pools
         {
             _logger.Information("symbol: {0:l} algorithm: {1:l} " +
                                 "version: {2:l} protocol: {3} wallet: {4} " +
-                                "network difficulty: {5:0.00000000} block difficulty: {6:0.00} network hashrate: {7:l} " +
-                                "network: {8:l} peers: {9} blocks: {10} errors: {11:l} ",
+                                "network difficulty: {5:0.00000000000} edgebits: {6} block difficulty: {7:0.00000000000} network hashrate: {8:l} " +
+                                "network: {9:l} peers: {10} blocks: {11} errors: {12:l} ",
                 _poolConfig.Coin.Symbol,
                 _poolConfig.Coin.Algorithm,
                 CoinVersion,
                 ProtocolVersion,
                 WalletVersion,
                 Difficulty,
+                DifficultyEdgeBits,
                 Difficulty * _hashAlgorithm.Multiplier,
                 Hashrate.GetReadableHashrate(),
                 Testnet ? "testnet" : "mainnet",
