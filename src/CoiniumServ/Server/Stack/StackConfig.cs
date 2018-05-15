@@ -45,7 +45,7 @@ namespace CoiniumServ.Server.Stack
             try
             {
                 // load the config data.
-                Name = string.IsNullOrEmpty(config.name) ? "CoiniumServ.com" : config.name;
+                Name = string.IsNullOrEmpty(config.name) ? "MERIT" : config.name;
 
                 Nodes = new List<IStackNode>();
 
