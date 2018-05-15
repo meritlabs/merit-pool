@@ -133,13 +133,14 @@ namespace CoiniumServ.Container
             return _applicationContext.Container.Resolve<IDaemonClient>(@params);
         }
 
-        public IMinerManager GetMinerManager(IPoolConfig poolConfig, IStorageLayer storageLayer, IAccountManager accountManager)
+        public IMinerManager GetMinerManager(IPoolConfig poolConfig, IStorageLayer storageLayer, IAccountManager accountManager, IDaemonClient daemonClient)
         {
             var @params = new NamedParameterOverloads
             {
                 {"poolConfig", poolConfig},
                 {"storageLayer", storageLayer},
                 {"accountManager", accountManager},
+                {"daemonClient", daemonClient},
             };
 
             return _applicationContext.Container.Resolve<IMinerManager>(@params);
