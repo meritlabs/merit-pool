@@ -229,7 +229,7 @@ namespace CoiniumServ.Pools
         private bool InitCoreServices()
         {
             AccountManager = _objectFactory.GetAccountManager(_storage, Config);
-            MinerManager = _objectFactory.GetMinerManager(Config, _storage, AccountManager);
+            MinerManager = _objectFactory.GetMinerManager(Config, _storage, AccountManager, Daemon);
 
             var jobTracker = _objectFactory.GetJobTracker(Config);
             _shareManager = _objectFactory.GetShareManager(Config, Daemon, jobTracker, _storage);

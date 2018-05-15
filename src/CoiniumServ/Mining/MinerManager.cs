@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CoiniumServ.Accounts;
+using CoiniumServ.Daemon;
 using CoiniumServ.Persistance.Layers;
 using CoiniumServ.Pools;
 using CoiniumServ.Server.Mining.Getwork;
@@ -54,6 +55,8 @@ namespace CoiniumServ.Mining
 
         private readonly IPoolConfig _poolConfig;
 
+        private readonly IDaemonClient _daemonClient;
+
         private readonly IStorageLayer _storageLayer;
 
         private readonly IAccountManager _accountManager;
@@ -65,11 +68,12 @@ namespace CoiniumServ.Mining
         /// </summary>
         private readonly object _minersLock = new object();
 
-        public MinerManager(IPoolConfig poolConfig, IStorageLayer storageLayer, IAccountManager accountManager)
+        public MinerManager(IPoolConfig poolConfig, IStorageLayer storageLayer, IAccountManager accountManager, IDaemonClient daemonClient)
         {
             _poolConfig = poolConfig;
             _storageLayer = storageLayer;
             _accountManager = accountManager;
+            _daemonClient = daemonClient;
 
             _miners = new Dictionary<int, IMiner>();
             _logger = Log.ForContext<MinerManager>().ForContext("Component", poolConfig.Coin.Name);
@@ -164,7 +168,10 @@ namespace CoiniumServ.Mining
             miner.Account = _accountManager.GetAccountByUsername(miner.Username); // query the user.
             if (miner.Account == null) // if the user doesn't exists.
             {
-                _accountManager.AddAccount(new Account(miner)); // create a new one.
+                
+                var addressInfo = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address);
+                var address = addressInfo.Address;
+                _accountManager.AddAccount(new Account(-1, miner.Username, address)); // create a new one.
                 miner.Account = _accountManager.GetAccountByUsername(miner.Username); // re-query the newly created record.
             }
 
