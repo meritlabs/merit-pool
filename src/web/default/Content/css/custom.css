@@ -40,6 +40,11 @@ body {
 .sidebar .sidebar-menu {
   margin-top: -1px;
 }
-.box.box-solid.box-primary > .box-header {
+.box.box-solid.box-primary > .box-header,
+.bg-aqua {
   background: #00b0dd;
+  background-color: #00b0dd;
+}
+body > .header .logo {
+  text-align: left;
 }
