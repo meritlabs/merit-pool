@@ -22,3 +22,24 @@ body > .header .logo {
   color: #fff;
   background: #555b70;
 }
+.skin-blue .navbar {
+  background: #f6f7fa;
+  box-shadow: 0 2px 2px rgba(46, 53, 59, 0.05);
+}
+html,
+body {
+  background: #f6f7fa;
+}
+.skin-blue .sidebar > .sidebar-menu > li > .treeview-menu {
+  margin: 0;
+  padding: 15px 0;
+}
+.sidebar .sidebar-menu .treeview-menu > li > a {
+  padding: 5px 5px 5px 0px;
+}
+.sidebar .sidebar-menu {
+  margin-top: -1px;
+}
+.box.box-solid.box-primary > .box-header {
+  background: #00b0dd;
+}
