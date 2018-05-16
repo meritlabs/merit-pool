@@ -4,25 +4,27 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-solid box-primary">
+        <div class="box box-solid box-free">
             <div class="box-header">
                 <h3 class="box-title">Block Details</h3>
             </div>
             <div class="box-body no-padding">
                 <table class="table table-striped">
-                    <tbody>
+                    <thead>
                         <tr>
-                            <th style="width: 10px" title="Height of the block">Height</th>
-                            <th title="Status of the block">Status</th>
+                            <th style="width: 100px;" title="Height of the block">Height</th>
+                            <th class="text-center" title="Status of the block">Status</th>
                             <th class="hidden-xs" title="Hash of the block">Block Hash</th>
                             <th class="hidden-xs" title="Hash of the generation transaction">Tx Hash</th>
                             <th title="Amount of coins generated">Amount</th>
-                            <th title="Did miners got paid for their contributions?">Paid</th>
-                            <th title="Time block was found">Date</th>
+                            <th class="text-center" title="Did miners got paid for their contributions?">Paid</th>
+                            <th class="text-right" title="Time block was found">Date</th>
                         </tr>
+                    </thead>
+                    <tbody>
                         <tr>
                             <td>@Model.Block.Height</td>
-                            <td>
+                            <td class="text-center">
                                 @switch (@Model.Block.Status)
                                 {
                                     case BlockStatus.Pending:
@@ -36,11 +38,19 @@
                                         break;
                                 }
                             </td>
-                            <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Block@Model.Block.BlockHash" target="_blank">@Model.Block.BlockHash.Substring(0, 10)</a></td>
-                            <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Tx@Model.Block.TransactionHash" target="_blank">@Model.Block.TransactionHash.Substring(0, 10)</a></td>
+                            <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Block@Model.Block.BlockHash" target="_blank">@Model.Block.BlockHash.Substring(0, 10)</a></td> -->
+                            <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Tx@Model.Block.TransactionHash" target="_blank">@Model.Block.TransactionHash.Substring(0, 10)</a></td> -->
+                            <td class="hidden-xs copy" title="@Model.Block.BlockHash">
+                                @Model.Block.BlockHash.Substring(0, 10)
+                                <i class="fa fa-copy copy" data-clipboard-text="@Model.Block.BlockHash" title="Copy Block Hash to clipboard"/>
+                            </td>
+                            <td class="hidden-xs copy" title="@Model.Block.TransactionHash">
+                                @Model.Block.TransactionHash.Substring(0, 10)
+                                <i class="fa fa-copy copy" data-clipboard-text="@Model.Block.TransactionHash" title="Copy Tx Hash to clipboard"/>
+                            </td>
                             <td>@Model.Block.Amount</td>
-                            <td><div class="label @(Model.Block.Accounted ?"bg-green":"bg-red")">@(Model.Block.Accounted ? "Yes" : "No")</div></td>
-                            <td><time class="timeago" datetime="@Model.Block.CreatedAt.ToString("o")">@Model.Block.CreatedAt.ToString("o")</time></td>
+                            <td class="text-center"><div class="label @(Model.Block.Accounted ?"bg-green":"bg-red")">@(Model.Block.Accounted ? "Yes" : "No")</div></td>
+                            <td class="text-right"><time class="timeago" datetime="@Model.Block.CreatedAt.ToString("o")">@Model.Block.CreatedAt.ToString("o")</time></td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,7 +61,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-solid box-danger">
+        <div class="box box-solid box-free">
             <div class="box-header">
                 <h3 class="box-title">Payment Details</h3>
             </div>
@@ -65,20 +75,22 @@
                 else
                 {
                     <table class="table table-striped">
-                        <tbody>
+                        <thead>
                             <tr>
-                                <th class="hidden-xs" title="Id of the payment">Payment Id</th>
-                                <th title="Payment address of the user">Address</th>
+                                <th style="width: 100px;" class="hidden-xs" title="Id of the payment">Payment Id</th>
+                                <th style="width: 260px;" title="Payment username/address of the user">Username</th>
                                 <th title="Amount of the payment">Amount</th>
-                                <th class="hidden-xs" title="Is the payment executed?">Fullfilled</th>
-                                <th class="hidden-xs" title="Id of the transaction">Tx Id</th>
-                                <th class="hidden-xs" title="Date of the payment">Date</th>
+                                <th class="hidden-xs text-center" title="Is the payment executed?">Fullfilled</th>
+                                <th class="hidden-xs text-right" title="Id of the transaction">Tx Id</th>
+                                <th class="hidden-xs text-right" title="Date of the payment">Date</th>
                             </tr>
+                        </thead>
+                        <tbody>
                             @foreach (var paymentDetails in @Model.Payments)
                             {
                                 <tr>
                                     <td class="hidden-xs"><a href="/pool/@Model.Coin.Symbol/payment/@paymentDetails.PaymentId">@paymentDetails.PaymentId</a></td>
-                                    <td><a href="/pool/@Model.Coin.Symbol/account/address/@paymentDetails.Address">@paymentDetails.Address</a></td>
+                                    <td><a href="/pool/@Model.Coin.Symbol/account/username/@paymentDetails.Username">@paymentDetails.Username</a></td>
                                     <td>
                                         @if (paymentDetails.Completed)
                                         {
@@ -89,8 +101,8 @@
                                             @: @paymentDetails.Amount @Model.Coin.Symbol
                                         }
                                     </td>
-                                    <td class="hidden-xs"><div class="label @(paymentDetails.Completed ?"bg-green":"bg-red")">@(paymentDetails.Completed ? "Yes" : "No")</div></td>
-                                    <td class="hidden-xs">
+                                    <td class="hidden-xs text-center"><div class="label @(paymentDetails.Completed ?"bg-green":"bg-red")">@(paymentDetails.Completed ? "Yes" : "No")</div></td>
+                                    <td class="hidden-xs text-right">
                                         @if (paymentDetails.Completed)
                                         {
                                             <a href="/pool/@Model.Coin.Symbol/tx/@paymentDetails.TransactionId">@paymentDetails.TransactionId</a>
@@ -100,7 +112,7 @@
                                             @:-
                                         }
                                     </td>
-                                    <td class="hidden-xs">
+                                    <td class="hidden-xs text-right">
                                         <time class="timeago" datetime="@(paymentDetails.Completed ? paymentDetails.TransactionDate.ToString("yyyy-MM-ddTHH:mm:ssZ") : paymentDetails.PaymentDate.ToString("yyyy-MM-ddTHH:mm:ssZ"))">@(paymentDetails.Completed ? paymentDetails.TransactionDate.ToString("yyyy-MM-ddTHH:mm:ssZ") : paymentDetails.PaymentDate.ToString("yyyy-MM-ddTHH:mm:ssZ"))</time>
                                     </td>
                                 </tr>

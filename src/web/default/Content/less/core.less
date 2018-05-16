@@ -22,7 +22,7 @@ a:hover, a:active, a:focus {
 /* Layouts */
 .wrapper {
     min-height: 100%;
-    .clearfix();    
+    .clearfix();
 }
 
 /* Header */
@@ -305,8 +305,8 @@ img {
     //Add to elements that you do not want to show when printing
     .no-print {
         display: none;
-    }  
-    
+    }
+
     //Elements that we want to hide when printing
     .left-side, .header, .content-header {
         display: none;
@@ -331,7 +331,7 @@ img {
 }
 
 .table.no-border {
-    
+
     &, td, th {
         border: 0;
     }
@@ -357,8 +357,8 @@ table.text-center {
     &, &.table td, &.table th {
         font-weight: 700;
     }
-    
-    
+
+
 }
 
 .border-radius-none {
@@ -384,7 +384,7 @@ Gradient Background colors
     color: #fff;
 }
 .bg-blue-gradient {
-    .gradient(@blue; @blue; lighten(@blue, 7%))!important;
+    background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
     color: #fff;
 }
 .bg-aqua-gradient {
@@ -396,7 +396,7 @@ Gradient Background colors
     color: #fff;
 }
 .bg-purple-gradient {
-    .gradient(@purple; @purple; lighten(@purple, 16%))!important;
+    background-image: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
     color: #fff;
 }
 .bg-green-gradient {

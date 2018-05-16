@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -68,7 +68,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/{slug}/workers"] = _ =>
             {
-                var pool = poolManager.Get(HttpUtility.HtmlEncode(_.slug)); // find the requested pool.                
+                var pool = poolManager.Get(HttpUtility.HtmlEncode(_.slug)); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -300,7 +300,7 @@ namespace CoiniumServ.Server.Web.Modules
                 return View["paymentdetails", model];
             };
 
-            Get["/{slug}/account/address/{address:length(26,34)}/{page?1}"] = _ =>
+            Get["/{slug}/account/username/{username}/{page?1}"] = _ =>
             {
                 var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(_.slug)); // find the requested pool.
 
@@ -312,13 +312,13 @@ namespace CoiniumServ.Server.Web.Modules
                     }];
                 }
 
-                var account = (IAccount)pool.AccountManager.GetAccountByAddress(_.address);
+                var account = (IAccount)pool.AccountManager.GetAccountByUsername(_.username);
 
                 if (account == null)
                 {
                     return View["error", new ErrorViewModel
                     {
-                        Details = string.Format("The requested account does not exist: {0}", _.address)
+                        Details = string.Format("The requested account does not exist: {0}", _.username)
                     }];
                 }
 

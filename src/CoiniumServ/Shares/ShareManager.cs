@@ -103,7 +103,6 @@ namespace CoiniumServ.Shares
                 cycleEdges[i] = Convert.ToUInt32(cycleEdgesStrs[i], 16);
             }
 
-
             // create the share
             var share = new Share(miner, id, job, extraNonce2, nTimeString, nonceString, cycleEdges);
 

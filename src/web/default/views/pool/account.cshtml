@@ -3,7 +3,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-solid box-danger">
+        <div class="box box-solid box-free">
             <div class="box-header">
                 <h3 class="box-title">Payment Details</h3>
             </div>
@@ -17,15 +17,17 @@
                 else
                 {
                     <table class="table table-striped">
-                        <tbody>
+                        <thead>
                             <tr>
                                 <th class="hidden-xs" title="Id of the payment">Payment Id</th>
                                 <th title="Block height for the payment">Block</th>
                                 <th title="Amount of the payment">Amount</th>
-                                <th class="hidden-xs" title="Is the payment executed?">Fullfilled</th>
-                                <th class="hidden-xs" title="Id of the transaction">Tx Id</th>
-                                <th class="hidden-xs" title="Date of the payment">Date</th>
+                                <th class="hidden-xs text-center" title="Is the payment executed?">Fullfilled</th>
+                                <th class="hidden-xs text-right" title="Id of the transaction">Tx Id</th>
+                                <th class="hidden-xs text-right" title="Date of the payment">Date</th>
                             </tr>
+                        </thead>
+                        <tbody>
                             @foreach (var paymentDetails in @Model.Payments)
                             {
                                 <tr>
@@ -41,8 +43,8 @@
                                             @: @paymentDetails.Amount @Model.Coin.Symbol
                                         }
                                     </td>
-                                    <td class="hidden-xs"><div class="label @(paymentDetails.Completed ?"bg-green":"bg-red")">@(paymentDetails.Completed ? "Yes" : "No")</div></td>
-                                    <td class="hidden-xs">
+                                    <td class="hidden-xs text-center"><div class="label @(paymentDetails.Completed ?"bg-green":"bg-red")">@(paymentDetails.Completed ? "Yes" : "No")</div></td>
+                                    <td class="hidden-xs text-right">
                                         @if (paymentDetails.Completed)
                                         {
                                             <a href="/pool/@Model.Coin.Symbol/tx/@paymentDetails.TransactionId">@paymentDetails.TransactionId</a>
@@ -52,7 +54,7 @@
                                             @:-
                                         }
                                     </td>
-                                    <td class="hidden-xs">
+                                    <td class="hidden-xs text-right">
                                         @(paymentDetails.Completed ? paymentDetails.TransactionDate : paymentDetails.PaymentDate)
                                     </td>
                                 </tr>
@@ -69,8 +71,8 @@
     <div class="col-md-12">
         @if (Model.PaginationQuery.Page - 1 >= 1)
         {
-            <a href="/pool/@Model.Coin.Symbol/account/address/@Model.Account.Address/@(Model.PaginationQuery.Page - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
+            <a href="/pool/@Model.Coin.Symbol/account/username/@Model.Account.Username/@(Model.PaginationQuery.Page - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
         }
-        <a href="/pool/@Model.Coin.Symbol/account/address/@Model.Account.Address/@(Model.PaginationQuery.Page + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
+        <a href="/pool/@Model.Coin.Symbol/account/username/@Model.Account.Username/@(Model.PaginationQuery.Page + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
     </div>
 </div>

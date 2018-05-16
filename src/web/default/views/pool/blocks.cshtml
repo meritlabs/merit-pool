@@ -5,15 +5,15 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-solid box-primary">
+        <div class="box box-solid box-primary box-free">
             <div class="box-header">
                 <h3 class="box-title">Blocks</h3>
             </div>
             <div class="box-body no-padding">
                 <table class="table table-striped">
-                    <tbody>
+                    <thead>
                         <tr>
-                            <th style="width: 10px" title="Height of the block">Height</th>
+                            <th title="Height of the block">Height</th>
                             <th title="Status of the block">Status</th>
                             <th title="Hash of the block">Block Hash</th>
                             <th title="Hash of the generation transaction">Tx Hash</th>
@@ -21,6 +21,8 @@
                             <th title="Did miners got paid for their contributions?">Paid</th>
                             <th title="Time block was found">Date</th>
                         </tr>
+                    </thead>
+                    <tbody>
                         @foreach (var block in Model.Blocks)
                         {
                             <tr>

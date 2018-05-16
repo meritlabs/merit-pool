@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -126,9 +126,9 @@ namespace CoiniumServ.Persistance.Layers.Hybrid
                 using (var connection = new MySqlConnection(_mySqlProvider.ConnectionString))
                 {
                     var results = connection.Query<PaymentDetails>(
-                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, p.Block, p.Amount as Amount, 
-                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed 
-                            FROM Payment p 
+                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, a.Username, p.Block, p.Amount as Amount,
+                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed
+                            FROM Payment p
                                 INNER JOIN Account as a ON p.AccountId = a.Id
                                 LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId Where Block = @height",
                         new { height });
@@ -156,9 +156,9 @@ namespace CoiniumServ.Persistance.Layers.Hybrid
                 using (var connection = new MySqlConnection(_mySqlProvider.ConnectionString))
                 {
                     var results = connection.Query<PaymentDetails>(
-                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, p.Block, p.Amount as Amount, 
-                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed 
-                            FROM Payment p 
+                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, a.Username, p.Block, p.Amount as Amount,
+                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed
+                            FROM Payment p
                                 INNER JOIN Account as a ON p.AccountId = a.Id
                                 LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId Where a.Id = @id
                             ORDER BY p.Id DESC LIMIT @offset, @count",
@@ -190,11 +190,11 @@ namespace CoiniumServ.Persistance.Layers.Hybrid
                 using (var connection = new MySqlConnection(_mySqlProvider.ConnectionString))
                 {
                     return connection.Query<PaymentDetails>(
-                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, p.Block, p.Amount as Amount, 
-                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed 
-                            FROM Payment p 
+                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, a.Username, p.Block, p.Amount as Amount,
+                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed
+                            FROM Payment p
                                 INNER JOIN Account as a ON p.AccountId = a.Id
-                                LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId 
+                                LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId
                                 Where t.Id = @id",
                         new {id}).Single();
                 }
@@ -220,11 +220,11 @@ namespace CoiniumServ.Persistance.Layers.Hybrid
                 using (var connection = new MySqlConnection(_mySqlProvider.ConnectionString))
                 {
                     return connection.Query<PaymentDetails>(
-                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, p.Block, p.Amount as Amount, 
-                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed 
-                            FROM Payment p 
+                        @"SELECT p.Id as PaymentId, t.Id as TransactionId, p.AccountId, a.Address, p.Block, p.Amount as Amount,
+                            t.Amount as SentAmount, t.Currency, t.TxHash, p.CreatedAt as PaymentDate, t.CreatedAt as TransactionDate, p.Completed
+                            FROM Payment p
                                 INNER JOIN Account as a ON p.AccountId = a.Id
-                                LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId 
+                                LEFT OUTER JOIN Transaction t On p.Id = t.PaymentId
                                 Where p.Id = @id",
                         new { id }).Single();
                 }
@@ -250,7 +250,7 @@ namespace CoiniumServ.Persistance.Layers.Hybrid
                 using (var connection = new MySqlConnection(_mySqlProvider.ConnectionString))
                 {
                     connection.Execute(
-                        @"INSERT INTO Transaction(AccountId, PaymentId, Amount, Currency, TxHash, CreatedAt) 
+                        @"INSERT INTO Transaction(AccountId, PaymentId, Amount, Currency, TxHash, CreatedAt)
                             VALUES(@accountId, @paymentId, @amount, @currency, @txHash, @createdAt)",
                         new
                         {
