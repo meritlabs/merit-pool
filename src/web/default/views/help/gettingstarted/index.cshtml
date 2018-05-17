@@ -77,10 +77,10 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width: 40px"></th>
+                            <th style="width: 40px" class="hidden-xs"></th>
                             <th style="width: 120px">Pool</th>
-                            <th style="width: 100px">Location</th>
-                            <th>Stratum Address</th>
+                            <th style="width: 100px" class="hidden-xs">Location</th>
+                            <th class="text-right">Stratum Address</th>
                             <th class="hidden-xs">Username</th>
                             <th class="hidden-xs">Password</th>
                         </tr>
@@ -89,10 +89,10 @@
                         @foreach (var node in Model.Stack.Nodes)
                         {
                             <tr>
-                                <td class="pool-icon"><img src="/Content/img/coins/icon/@(Model.Pool.Config.Coin.Symbol).png" /></td>
+                                <td class="pool-icon hidden-xs"><img src="/Content/img/coins/icon/@(Model.Pool.Config.Coin.Symbol).png" /></td>
                                 <td>@Model.Pool.Config.Coin.Name</td>
-                                <td><img src="/Content/img/flags/@(node.Location).png" alt="@node.Location" /></td>
-                                <td>stratum+tcp://@node.Address</td>
+                                <td class="hidden-xs"><img src="/Content/img/flags/@(node.Location).png" alt="@node.Location" /></td>
+                                <td class="text-right">stratum+tcp://@node.Address</td>
                                 <td class="hidden-xs">Your wallet address</td>
                                 <td class="hidden-xs">Anything</td>
                             </tr>

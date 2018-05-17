@@ -13,13 +13,13 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th title="Height of the block">Height</th>
-                            <th title="Status of the block">Status</th>
-                            <th title="Hash of the block">Block Hash</th>
-                            <th title="Hash of the generation transaction">Tx Hash</th>
-                            <th title="Amount of coins generated">Amount</th>
-                            <th title="Did miners got paid for their contributions?">Paid</th>
-                            <th title="Time block was found">Date</th>
+                            <th style="width: 60px;" title="Height of the block">Height</th>
+                            <th class="text-center" title="Status of the block">Status</th>
+                            <th class="hidden-xs text-right" title="Hash of the block">Block Hash</th>
+                            <th class="hidden-xs text-right" title="Hash of the generation transaction">Tx Hash</th>
+                            <th class="hidden-xs text-right" title="Amount of coins generated">Amount</th>
+                            <th style="width: 50px;" class="text-center" title="Did miners got paid for their contributions?">Paid</th>
+                            <th class="text-right" title="Time block was found">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,7 +27,7 @@
                         {
                             <tr>
                                 <td><a href="/block/@block.Height">@block.Height</a></td>
-                                <td>
+                                <td class="text-center">
                                     @switch (@block.Status)
                                     {
                                         case BlockStatus.Pending:
@@ -41,11 +41,19 @@
                                             break;
                                     }
                                 </td>
-                                <td><a href="@Model.Coin.BlockExplorer.Block@block.BlockHash" target="_blank">@block.BlockHash.Substring(0, 10)</a></td>
-                                <td><a href="@Model.Coin.BlockExplorer.Tx@block.TransactionHash" target="_blank">@block.TransactionHash.Substring(0, 10)</a></td>
-                                <td>@block.Amount</td>
-                                <td><div class="label @(block.Accounted ?"bg-green":"bg-red")">@(block.Accounted ? "Yes" : "No")</div></td>
-                                <td><time class="timeago" datetime="@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time></td>
+                                <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Block@block.BlockHash" target="_blank">@block.BlockHash.Substring(0, 10)</a></td> -->
+                                <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Tx@block.TransactionHash" target="_blank">@block.TransactionHash.Substring(0, 10)</a></td> -->
+                                <td class="hidden-xs text-right">
+                                    @block.BlockHash.Substring(0, 10)
+                                    <i class="fa fa-copy copy" data-clipboard-text="@block.BlockHash" title="Copy Block Hash to clipboard"/>
+                                </td>
+                                <td class="hidden-xs text-right">
+                                    @block.TransactionHash.Substring(0, 10)
+                                    <i class="fa fa-copy copy" data-clipboard-text="@block.TransactionHash" title="Copy Block Hash to clipboard"/>
+                                </td>
+                                <td class="hidden-xs text-right">@block.Amount</td>
+                                <td class="text-center"><div class="label @(block.Accounted ?"bg-green":"bg-red")">@(block.Accounted ? "Yes" : "No")</div></td>
+                                <td class="text-right"><time class="timeago" datetime="@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time></td>
                             </tr>
                         }
                     </tbody>

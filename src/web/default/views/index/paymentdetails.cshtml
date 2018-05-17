@@ -30,7 +30,7 @@
                     <div class="list-group-item" title="Payment address for the account">
                         <div class="row">
                             <div class="col-xs-3">Address</div>
-                            <div class="col-xs-9 text-right"><a href="/account/username/@Model.Account.Address">@Model.Account.Username</a></div>
+                            <div class="col-xs-9 text-right"><a href="/account/username/@Model.Account.Username">@Model.Account.Username</a></div>
                         </div>
                     </div>
                 </div>
@@ -49,26 +49,26 @@
                 <div class="list-group">
                     <div class="list-group-item" title="The id of the payment">
                         <div class="row">
-                            <div class="col-xs-6">Id</div>
-                            <div class="col-xs-6 text-right"><a href="/payment/@Model.Details.PaymentId">@Model.Details.PaymentId</a></div>
+                            <div class="col-xs-4">Id</div>
+                            <div class="col-xs-8 text-right"><a href="/payment/@Model.Details.PaymentId">@Model.Details.PaymentId</a></div>
                         </div>
                     </div>
                     <div class="list-group-item" title="The amount of the payment">
                         <div class="row">
-                            <div class="col-xs-6">Amount</div>
-                            <div class="col-xs-6 text-right">@Model.Details.Amount @Model.Coin.Symbol</div>
+                            <div class="col-xs-4">Amount</div>
+                            <div class="col-xs-8 text-right">@Model.Details.Amount @Model.Coin.Symbol</div>
                         </div>
                     </div>
                     <div class="list-group-item" title="Is the payment fullfilled?">
                         <div class="row">
-                            <div class="col-xs-6">Fullfilled</div>
-                            <div class="col-xs-6 text-right"><div class="label @(Model.Details.Completed ?"bg-green":"bg-red")">@(Model.Details.Completed ? "Yes" : "No")</div></div>
+                            <div class="col-xs-4">Fullfilled</div>
+                            <div class="col-xs-8 text-right"><div class="label @(Model.Details.Completed ?"bg-green":"bg-red")">@(Model.Details.Completed ? "Yes" : "No")</div></div>
                         </div>
                     </div>
                     <div class="list-group-item" title="Date of the payment">
                         <div class="row">
-                            <div class="col-xs-6">Date</div>
-                            <div class="col-xs-6 text-right">@Model.Details.PaymentDate</div>
+                            <div class="col-xs-4">Date</div>
+                            <div class="col-xs-8 text-right">@Model.Details.PaymentDate</div>
                         </div>
                     </div>
                 </div>
@@ -85,21 +85,21 @@
                 <div class="list-group">
                     <div class="list-group-item" title="The id of the payment">
                         <div class="row">
-                            <div class="col-xs-6">Id</div>
-                            <div class="col-xs-6 text-right"><a href="/tx/@Model.Details.TransactionId">@Model.Details.TransactionId</a></div>
+                            <div class="col-xs-4">Id</div>
+                            <div class="col-xs-8 text-right"><a href="/tx/@Model.Details.TransactionId">@Model.Details.TransactionId</a></div>
                         </div>
                     </div>
                     <div class="list-group-item" title="The amount of the sent coins">
                         <div class="row">
-                            <div class="col-xs-6">Amount</div>
-                            <div class="col-xs-6 text-right">@Model.Details.SentAmount @Model.Details.Currency</div>
+                            <div class="col-xs-4">Amount</div>
+                            <div class="col-xs-8 text-right">@Model.Details.SentAmount @Model.Details.Currency</div>
                         </div>
                     </div>
                     <div class="list-group-item" title="The hash of the transaction">
                         <div class="row">
-                            <div class="col-xs-6">Hash</div>
+                            <div class="col-xs-4">Hash</div>
                             <!-- <div class="col-xs-6 text-right"><a href="@Model.Coin.BlockExplorer.Tx@Model.Details.TxHash" target="_blank">@Model.Details.TxHash.Substring(0, 10)</a></div> -->
-                            <div class="col-xs-6 text-right">
+                            <div class="col-xs-8 text-right">
                                 @Model.Details.TxHash.Substring(0, 10)
                                 <i class="fa fa-copy copy" data-clipboard-text="@Model.Details.TxHash" title="Copy Tx Hash to clipboard"></i>
                             </div>
@@ -107,8 +107,8 @@
                     </div>
                     <div class="list-group-item" title="Date of the transaction">
                         <div class="row">
-                            <div class="col-xs-6">Date</div>
-                            <div class="col-xs-6 text-right">@Model.Details.TransactionDate</div>
+                            <div class="col-xs-4">Date</div>
+                            <div class="col-xs-8 text-right">@Model.Details.TransactionDate</div>
                         </div>
                     </div>
                 </div>

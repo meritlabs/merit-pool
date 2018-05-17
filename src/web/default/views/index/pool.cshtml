@@ -157,10 +157,10 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Block</th>
-                            <th>Status</th>
-                            <th>Time</th>
-                            <th>Amount</th>
+                            <th style="width: 100px;">Block</th>
+                            <th style="width: 100px;" class="text-center">Status</th>
+                            <th class="text-right">Time</th>
+                            <th class="hidden-xs text-right">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -168,7 +168,7 @@
                         {
                             <tr>
                                 <td><a href="/block/@block.Height">@block.Height</a></td>
-                                <td>
+                                <td class="text-center">
                                     @switch (block.Status)
                                     {
                                         case BlockStatus.Pending:
@@ -182,10 +182,10 @@
                                             break;
                                     }
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     <time class="timeago" datetime="@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time>
                                 </td>
-                                <td>@block.Amount</td>
+                                <td class="hidden-xs text-right">@block.Amount</td>
                             </tr>
                         }
                     </tbody>
@@ -206,10 +206,10 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Block</th>
-                            <th>Status</th>
-                            <th>Time</th>
-                            <th>Reward</th>
+                            <th style="width: 100px;">Block</th>
+                            <th style="width: 100px;" class="text-center">Status</th>
+                            <th class="text-right">Time</th>
+                            <th class="hidden-xs text-right">Reward</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,7 +217,7 @@
                         {
                             <tr>
                                 <td><a href="/block/@block.Height">@block.Height</a></td>
-                                <td>
+                                <td class="text-center">
                                     @switch (block.Status)
                                     {
                                         case BlockStatus.Pending:
@@ -231,8 +231,8 @@
                                             break;
                                     }
                                 </td>
-                                <td><time class="timeago" datetime="@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time></td>
-                                <td>@block.Reward</td>
+                                <td class="text-right"><time class="timeago" datetime="@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time></td>
+                                <td class="hidden-xs text-right">@block.Reward</td>
                             </tr>
                         }
                     </tbody>
