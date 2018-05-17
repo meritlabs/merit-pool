@@ -13,7 +13,7 @@
                     <div class="list-group-item" title="Height of the block">
                         <div class="row">
                             <div class="col-xs-6">Height</div>
-                            <div class="col-xs-6 text-right"><a href="/pool/@Model.Coin.Symbol/block/@Model.Block.Height">@Model.Block.Height</a></div>
+                            <div class="col-xs-6 text-right"><a href="/block/@Model.Block.Height">@Model.Block.Height</a></div>
                         </div>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                     <div class="list-group-item" title="Payment address for the account">
                         <div class="row">
                             <div class="col-xs-3">Address</div>
-                            <div class="col-xs-9 text-right"><a href="/pool/@Model.Coin.Symbol/account/username/@Model.Account.Address">@Model.Account.Username</a></div>
+                            <div class="col-xs-9 text-right"><a href="/account/username/@Model.Account.Address">@Model.Account.Username</a></div>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     <div class="list-group-item" title="The id of the payment">
                         <div class="row">
                             <div class="col-xs-6">Id</div>
-                            <div class="col-xs-6 text-right"><a href="/pool/@Model.Coin.Symbol/payment/@Model.Details.PaymentId">@Model.Details.PaymentId</a></div>
+                            <div class="col-xs-6 text-right"><a href="/payment/@Model.Details.PaymentId">@Model.Details.PaymentId</a></div>
                         </div>
                     </div>
                     <div class="list-group-item" title="The amount of the payment">
@@ -86,7 +86,7 @@
                     <div class="list-group-item" title="The id of the payment">
                         <div class="row">
                             <div class="col-xs-6">Id</div>
-                            <div class="col-xs-6 text-right"><a href="/pool/@Model.Coin.Symbol/tx/@Model.Details.TransactionId">@Model.Details.TransactionId</a></div>
+                            <div class="col-xs-6 text-right"><a href="/tx/@Model.Details.TransactionId">@Model.Details.TransactionId</a></div>
                         </div>
                     </div>
                     <div class="list-group-item" title="The amount of the sent coins">

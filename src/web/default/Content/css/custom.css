@@ -29,8 +29,15 @@ body > .header .logo {
   justify-content: center;
 }
 
+body > .header .logo:hover {
+  background: #2c3141;
+}
+
 body > .header .navbar {
+  display: flex;
+  align-items: center;
   height: 70px;
+  padding: 0 40px;
   margin-left: 260px;
   background: #fff;
   box-shadow: 0 2px 2px rgba(46, 53, 59, 0.05);
@@ -43,6 +50,26 @@ body > .header .navbar {
 /*left side - contains sidebar*/
 .left-side {
   width: 260px;
+}
+
+.get-started {
+  display: inline-block;
+  background: #00b0dd;
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: .3px;
+  transition: all 0.3s linear;
+}
+
+.get-started:hover {
+  background: rgba(0, 176, 221, 0.7);
+  border: 1px solid transparent;
+  color: #fff;
 }
 
 .content {

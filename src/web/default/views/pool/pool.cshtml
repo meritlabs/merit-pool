@@ -68,13 +68,13 @@
                             <div class="col-xs-8 text-right">@Model.Pool.Hashrate.GetReadableHashrate()</div>
                         </div>
                     </div>
-                    <a href="/pool/@Model.Pool.Config.Coin.Symbol/workers" class="list-group-item" title="Total of number of workers connected to pool">
+                    <a href="/workers" class="list-group-item" title="Total of number of workers connected to pool">
                         <div class="row">
                             <div class="col-xs-4">Workers</div>
                             <div class="col-xs-8 text-right">@Model.Pool.MinerManager.Count</div>
                         </div>
                     </a>
-                    <a href="/pool/@Model.Pool.Config.Coin.Symbol/round" class="list-group-item" title="Current round within the network">
+                    <a href="/round" class="list-group-item" title="Current round within the network">
                         <div class="row">
                             <div class="col-xs-4">Current Round</div>
                             <div class="col-xs-8 text-right">@Model.Pool.NetworkInfo.Round</div>
@@ -150,7 +150,7 @@
             <div class="box-header">
                 <h3 class="box-title">Latest Blocks</h3>
                 <div class="box-tools pull-right">
-                    <a href="/pool/@Model.Pool.Config.Coin.Symbol/blocks/" type="button" class="btn btn-primary"><i class="fa fa-angle-double-right"></i></a>
+                    <a href="/blocks/" type="button" class="btn btn-primary"><i class="fa fa-angle-double-right"></i></a>
                 </div>
             </div>
             <div class="box-body no-padding">
@@ -167,7 +167,7 @@
                         @foreach (var block in Model.Pool.BlockRepository.Latest)
                         {
                             <tr>
-                                <td><a href="/pool/@Model.Pool.Config.Coin.Symbol/block/@block.Height">@block.Height</a></td>
+                                <td><a href="/block/@block.Height">@block.Height</a></td>
                                 <td>
                                     @switch (block.Status)
                                     {
@@ -199,7 +199,7 @@
             <div class="box-header">
                 <h3 class="box-title">Latest Paid Blocks</h3>
                 <div class="box-tools pull-right">
-                    <a href="/pool/@Model.Pool.Config.Coin.Symbol/blocks/paid/" type="button" class="btn btn-danger"><i class="fa fa-angle-double-right"></i></a>
+                    <a href="/blocks/paid/" type="button" class="btn btn-danger"><i class="fa fa-angle-double-right"></i></a>
                 </div>
             </div>
             <div class="box-body no-padding">
@@ -216,7 +216,7 @@
                         @foreach (var block in Model.Pool.BlockRepository.LatestPaid)
                         {
                             <tr>
-                                <td><a href="/pool/@Model.Pool.Config.Coin.Symbol/block/@block.Height">@block.Height</a></td>
+                                <td><a href="/block/@block.Height">@block.Height</a></td>
                                 <td>
                                     @switch (block.Status)
                                     {

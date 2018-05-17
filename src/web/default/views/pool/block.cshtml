@@ -89,8 +89,8 @@
                             @foreach (var paymentDetails in @Model.Payments)
                             {
                                 <tr>
-                                    <td class="hidden-xs"><a href="/pool/@Model.Coin.Symbol/payment/@paymentDetails.PaymentId">@paymentDetails.PaymentId</a></td>
-                                    <td><a href="/pool/@Model.Coin.Symbol/account/username/@paymentDetails.Username">@paymentDetails.Username</a></td>
+                                    <td class="hidden-xs"><a href="/payment/@paymentDetails.PaymentId">@paymentDetails.PaymentId</a></td>
+                                    <td><a href="/account/username/@paymentDetails.Username">@paymentDetails.Username</a></td>
                                     <td>
                                         @if (paymentDetails.Completed)
                                         {
@@ -105,7 +105,7 @@
                                     <td class="hidden-xs text-right">
                                         @if (paymentDetails.Completed)
                                         {
-                                            <a href="/pool/@Model.Coin.Symbol/tx/@paymentDetails.TransactionId">@paymentDetails.TransactionId</a>
+                                            <a href="/tx/@paymentDetails.TransactionId">@paymentDetails.TransactionId</a>
                                         }
                                         else
                                         {
@@ -127,7 +127,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <a href="/pool/@Model.Coin.Symbol/block/@(Model.Block.Height - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
-        <a href="/pool/@Model.Coin.Symbol/block/@(Model.Block.Height + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
+        <a href="/block/@(Model.Block.Height - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
+        <a href="/block/@(Model.Block.Height + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
     </div>
 </div>

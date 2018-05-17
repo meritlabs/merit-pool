@@ -416,7 +416,6 @@
     <Compile Include="Server\Web\Models\Pool\BlocksModel.cs" />
     <Compile Include="Server\Web\Models\Pool\PaymentDetailsModel.cs" />
     <Compile Include="Server\Web\Models\Pool\PoolModel.cs" />
-    <Compile Include="Server\Web\Models\Pool\PoolsModel.cs" />
     <Compile Include="Server\Web\Models\RoundModel.cs" />
     <Compile Include="Server\Web\Models\WorkersModel.cs" />
     <Compile Include="Server\Web\Modules\AlgorithmModule.cs" />
@@ -426,8 +425,6 @@
     <Compile Include="Server\Web\Modules\DonateModule.cs" />
     <Compile Include="Server\Web\Modules\HelpModule.cs" />
     <Compile Include="Server\Web\Modules\IndexModule.cs" />
-    <Compile Include="Server\Web\Modules\PoolModule.cs" />
-    <Compile Include="Server\Web\Modules\PoolsModule.cs" />
     <Compile Include="Server\Web\Modules\TosModule.cs" />
     <Compile Include="Server\Web\NancyBootstrapper.cs" />
     <Compile Include="Server\Web\RootPathProvider.cs" />

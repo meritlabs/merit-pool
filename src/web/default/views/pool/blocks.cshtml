@@ -26,7 +26,7 @@
                         @foreach (var block in Model.Blocks)
                         {
                             <tr>
-                                <td><a href="/pool/@Model.Coin.Symbol/block/@block.Height">@block.Height</a></td>
+                                <td><a href="/block/@block.Height">@block.Height</a></td>
                                 <td>
                                     @switch (@block.Status)
                                     {
@@ -59,8 +59,8 @@
     <div class="col-md-12">
         @if (Model.PaginationQuery.Page - 1 >= 1)
         {
-            <a href="/pool/@Model.Coin.Symbol/blocks/@(Model.Filter == BlockFilter.PaidOnly ? "paid" : "")@(Model.PaginationQuery.Page - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
+            <a href="/blocks/@(Model.Filter == BlockFilter.PaidOnly ? "paid" : "")@(Model.PaginationQuery.Page - 1)" type="button" class="btn btn-default btn-sm"><i class="fa fa-angle-double-left"></i> Prev</a>
         }
-        <a href="/pool/@Model.Coin.Symbol/blocks/@(Model.Filter == BlockFilter.PaidOnly ?"paid" : "")@(Model.PaginationQuery.Page + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
+        <a href="/blocks/@(Model.Filter == BlockFilter.PaidOnly ?"paid" : "")@(Model.PaginationQuery.Page + 1)" type="button" class="btn btn-default btn-sm pull-right"><i class="fa fa-angle-double-right"></i> Next</a>
     </div>
 </div>
