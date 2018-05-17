@@ -41,6 +41,8 @@ namespace CoiniumServ.Daemon.Responses
 
         public string Address { get; set; }
 
+        public string Alias { get; set; }
+
         public bool IsMine { get; set; }
 
         public bool IsScript { get; set; }

@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
 //     Hüseyin Uslu, shalafiraistlin at gmail dot com
 //     https://github.com/bonesoul/CoiniumServ
-// 
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -42,14 +42,14 @@ using Serilog;
 namespace CoiniumServ.Mining
 {
     public class MinerManager : IMinerManager
-    {        
+    {
         public int Count { get { return _miners.Count(kvp => kvp.Value.Authenticated); } }
 
         public IList<IMiner> Miners { get { return _miners.Values.ToList(); } }
 
         public event EventHandler MinerAuthenticated;
 
-        private readonly Dictionary<int, IMiner> _miners;        
+        private readonly Dictionary<int, IMiner> _miners;
 
         private int _counter = 0; // counter for assigining unique id's to miners.
 
@@ -87,8 +87,8 @@ namespace CoiniumServ.Mining
         public IMiner GetByConnection(IConnection connection)
         {
             return (from pair in _miners  // returned the miner associated with the given connection.
-                let client = (IClient) pair.Value 
-                where client.Connection == connection 
+                let client = (IClient) pair.Value
+                where client.Connection == connection
                 select pair.Value).FirstOrDefault();
         }
 
@@ -114,9 +114,9 @@ namespace CoiniumServ.Mining
         {
             var @params = new object[]
             {
-                _counter++, 
-                extraNonce, 
-                connection, 
+                _counter++,
+                extraNonce,
+                connection,
                 pool,
                 this,
                 _storageLayer
@@ -124,9 +124,9 @@ namespace CoiniumServ.Mining
 
             var instance = Activator.CreateInstance(typeof(T), @params);  // create an instance of the miner.
             var miner = (IStratumMiner)instance;
-            
+
             lock (_minersLock) // lock the list before we modify the collection.
-                _miners.Add(miner.Id, miner); // add it to our collection.           
+                _miners.Add(miner.Id, miner); // add it to our collection.
 
             return (T)miner;
         }
@@ -155,7 +155,7 @@ namespace CoiniumServ.Mining
                 miner.Authenticated ? "Authenticated miner: {0:l} [{1:l}]" : "Miner authentication failed: {0:l} [{1:l}]",
                 miner.Username, ((IClient) miner).Connection.RemoteEndPoint);
 
-            if (!miner.Authenticated) 
+            if (!miner.Authenticated)
                 return;
 
             if (miner is IStratumMiner) // if we are handling a stratum-miner, apply stratum specific stuff.
@@ -168,14 +168,15 @@ namespace CoiniumServ.Mining
             miner.Account = _accountManager.GetAccountByUsername(miner.Username); // query the user.
             if (miner.Account == null) // if the user doesn't exists.
             {
-                
-                var addressInfo = _daemonClient.ValidateAddress(_poolConfig.Wallet.Address);
+                var addressInfo = _daemonClient.ValidateAddress(miner.Username);
                 var address = addressInfo.Address;
-                _accountManager.AddAccount(new Account(-1, miner.Username, address)); // create a new one.
-                miner.Account = _accountManager.GetAccountByUsername(miner.Username); // re-query the newly created record.
+                var username = string.IsNullOrEmpty(addressInfo.Alias) ? address : addressInfo.Alias;
+                _accountManager.AddAccount(new Account(-1, username, address)); // create a new one.
+
+                miner.Account = _accountManager.GetAccountByUsername(username); // re-query the newly created record.
             }
 
-            OnMinerAuthenticated(new MinerEventArgs(miner)); // notify listeners about the new authenticated miner.            
+            OnMinerAuthenticated(new MinerEventArgs(miner)); // notify listeners about the new authenticated miner.
         }
 
         // todo: consider exposing this event by miner object itself.
