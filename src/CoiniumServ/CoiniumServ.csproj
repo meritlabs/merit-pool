@@ -408,7 +408,6 @@
     <Compile Include="Server\Web\Models\Algorithm\AlgorithmsModel.cs" />
     <Compile Include="Server\Web\Models\ApiModel.cs" />
     <Compile Include="Server\Web\Models\GettingStarted\GettingStartedModel.cs" />
-    <Compile Include="Server\Web\Models\GettingStarted\GettingStartedPoolModel.cs" />
     <Compile Include="Server\Web\Models\IndexModel.cs" />
     <Compile Include="Server\Web\Models\JsonError.cs" />
     <Compile Include="Server\Web\Models\Pool\AccountModel.cs" />

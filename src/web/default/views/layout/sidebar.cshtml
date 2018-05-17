@@ -1,16 +1,24 @@
 ﻿<section class="sidebar">
     <ul class="sidebar-menu">
-        <li class="active">
+        <li class="@(string.IsNullOrEmpty(@ViewBag.ActiveLink) ? "active" : "")">
             <a href="/">
                 <img src="/Content/img/icons/home.svg">
                 <span>Home</span>
             </a>
         </li>
-        <!-- <li>
+        <li class="@(ViewBag.ActiveLink == "help" ? "active" : "")">
             <a href="/help/gettingstarted/">
-                <img src="/Content/img/icons/network.svg">
+                <span class="icon"><i class="ion ion-md-laptop"></i></span>
                 <span>Getting Started</span>
             </a>
-        </li> -->
+        </li>
+    </ul>
+    <ul class="sidebar-menu">
+        <li>
+            <a href="https://www.merit.me/get-involved/#join-the-conversation" target="_blank">
+                <img src="/Content/img/icons/info.svg">
+                <span>Help &amp; Support</span>
+            </a>
+        </li>
     </ul>
 </section>

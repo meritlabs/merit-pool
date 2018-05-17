@@ -47,7 +47,7 @@ namespace CoiniumServ.Server.Web.Modules
         {
             Get["/"] = _ =>
             {
-                var pool = poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null)
                 {
@@ -69,7 +69,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/workers"] = _ =>
             {
-                var pool = poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -90,7 +90,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/round"] = _ =>
             {
-                var pool = poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -112,7 +112,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/blocks/{page?1}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -151,7 +151,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/blocks/paid/{page?1}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -190,7 +190,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/block/{height:int}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -225,7 +225,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/tx/{id:int}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -264,7 +264,7 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/payment/{id:int}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null) // make sure queried pool exists.
                 {
@@ -303,13 +303,13 @@ namespace CoiniumServ.Server.Web.Modules
 
             Get["/account/username/{username}/{page?1}"] = _ =>
             {
-                var pool = (IPool)poolManager.Get(HttpUtility.HtmlEncode(slug)); // find the requested pool.
+                var pool = (IPool)poolManager.Get(slug); // find the requested pool.
 
                 if (pool == null)
                 {
                     return View["error", new ErrorViewModel
                     {
-                        Details = string.Format("The requested pool does not exist: {0}", HttpUtility.HtmlEncode(slug))
+                        Details = string.Format("The requested pool does not exist: {0}", slug)
                     }];
                 }
 
