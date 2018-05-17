@@ -411,3 +411,11 @@ body > .header .navbar {
 .pool-config {
   margin-top: 50px;
 }
+
+.miners td.link  {
+  padding: 5px 10px 4px;
+}
+
+.miners .icon {
+  font-size: 18px;
+}
