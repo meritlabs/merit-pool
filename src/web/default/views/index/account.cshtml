@@ -21,7 +21,7 @@
                             <tr>
                                 <th class="hidden-xs" title="Id of the payment">Payment Id</th>
                                 <th title="Block height for the payment">Block</th>
-                                <th title="Amount of the payment">Amount</th>
+                                <th class="text-right" title="Amount of the payment">Amount</th>
                                 <th class="hidden-xs text-center" title="Is the payment executed?">Fullfilled</th>
                                 <th class="hidden-xs text-right" title="Id of the transaction">Tx Id</th>
                                 <th class="hidden-xs text-right" title="Date of the payment">Date</th>
@@ -32,8 +32,8 @@
                             {
                                 <tr>
                                     <td class="hidden-xs">@paymentDetails.PaymentId</td>
-                                <td><a href="/block/@paymentDetails.Block">@paymentDetails.Block</a></td>
-                                    <td>
+                                    <td><a href="/block/@paymentDetails.Block">@paymentDetails.Block</a></td>
+                                    <td class="text-right">
                                         @if (paymentDetails.Completed)
                                         {
                                             @: @paymentDetails.Amount @paymentDetails.Currency

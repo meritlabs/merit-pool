@@ -12,12 +12,12 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width: 100px;" title="Height of the block">Height</th>
-                            <th class="text-center" title="Status of the block">Status</th>
-                            <th class="hidden-xs" title="Hash of the block">Block Hash</th>
-                            <th class="hidden-xs" title="Hash of the generation transaction">Tx Hash</th>
-                            <th title="Amount of coins generated">Amount</th>
-                            <th class="text-center" title="Did miners got paid for their contributions?">Paid</th>
+                            <th style="width: 70px;" title="Height of the block">Height</th>
+                            <th style="width: 80px;" class="text-center" title="Status of the block">Status</th>
+                            <th class="hidden-xs text-right" title="Hash of the block">Block Hash</th>
+                            <th class="hidden-xs text-right" title="Hash of the generation transaction">Tx Hash</th>
+                            <th class="hidden-xs text-right" title="Amount of coins generated">Amount</th>
+                            <th style="width: 70px;" class="text-center" title="Did miners got paid for their contributions?">Paid</th>
                             <th class="text-right" title="Time block was found">Date</th>
                         </tr>
                     </thead>
@@ -40,15 +40,15 @@
                             </td>
                             <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Block@Model.Block.BlockHash" target="_blank">@Model.Block.BlockHash.Substring(0, 10)</a></td> -->
                             <!-- <td class="hidden-xs"><a href="@Model.Coin.BlockExplorer.Tx@Model.Block.TransactionHash" target="_blank">@Model.Block.TransactionHash.Substring(0, 10)</a></td> -->
-                            <td class="hidden-xs copy" title="@Model.Block.BlockHash">
+                            <td class="hidden-xs text-right copy" title="@Model.Block.BlockHash">
                                 @Model.Block.BlockHash.Substring(0, 10)
                                 <i class="fa fa-copy copy" data-clipboard-text="@Model.Block.BlockHash" title="Copy Block Hash to clipboard"/>
                             </td>
-                            <td class="hidden-xs copy" title="@Model.Block.TransactionHash">
+                            <td class="hidden-xs text-right copy" title="@Model.Block.TransactionHash">
                                 @Model.Block.TransactionHash.Substring(0, 10)
                                 <i class="fa fa-copy copy" data-clipboard-text="@Model.Block.TransactionHash" title="Copy Tx Hash to clipboard"/>
                             </td>
-                            <td>@Model.Block.Amount</td>
+                            <td class="hidden-xs text-right">@Model.Block.Amount</td>
                             <td class="text-center"><div class="label @(Model.Block.Accounted ?"bg-green":"bg-red")">@(Model.Block.Accounted ? "Yes" : "No")</div></td>
                             <td class="text-right"><time class="timeago" datetime="@Model.Block.CreatedAt.ToString("o")">@Model.Block.CreatedAt.ToString("o")</time></td>
                         </tr>
@@ -79,7 +79,7 @@
                             <tr>
                                 <th style="width: 100px;" class="hidden-xs" title="Id of the payment">Payment Id</th>
                                 <th style="width: 260px;" title="Payment username/address of the user">Username</th>
-                                <th title="Amount of the payment">Amount</th>
+                                <th class="text-right" title="Amount of the payment">Amount</th>
                                 <th class="hidden-xs text-center" title="Is the payment executed?">Fullfilled</th>
                                 <th class="hidden-xs text-right" title="Id of the transaction">Tx Id</th>
                                 <th class="hidden-xs text-right" title="Date of the payment">Date</th>
@@ -91,7 +91,7 @@
                                 <tr>
                                     <td class="hidden-xs"><a href="/payment/@paymentDetails.PaymentId">@paymentDetails.PaymentId</a></td>
                                     <td><a href="/account/username/@paymentDetails.Username">@paymentDetails.Username</a></td>
-                                    <td>
+                                    <td class="text-right">
                                         @if (paymentDetails.Completed)
                                         {
                                             @: @paymentDetails.Amount @paymentDetails.Currency

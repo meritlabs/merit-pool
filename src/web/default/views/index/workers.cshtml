@@ -13,21 +13,21 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width: 100px;">Id</th>
-                            <th style="width: 260px;">Username</th>
-                            <th>Difficulty</th>
-                            <th>Valid Shares</th>
-                            <th>Invalid Shares</th>
-                            <th class="text-right">Software</th>
+                            <th class="hidden-xs" style="width: 60px;">Id</th>
+                            <th style="width: 270px;">Username</th>
+                            <th class="hidden-xs text-right">Difficulty</th>
+                            <th class="text-right">Valid Shares</th>
+                            <th class="hidden-xs text-right">Invalid Shares</th>
+                            <th class="hidden-xs text-right">Software</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var worker in Model.Workers)
                         {
                             <tr>
-                                <td>@worker.Id</td>
+                                <td class="hidden-xs">@worker.Id</td>
                                 <td>@worker.Username</td>
-                                <td>
+                                <td class="hidden-xs text-right">
                                     @if (worker is IStratumMiner)
                                     {
                                         @((worker as IStratumMiner).Difficulty)
@@ -37,9 +37,9 @@
                                         @:
                                     }
                                 </td>
-                                <td>@worker.ValidShareCount</td>
-                                <td>@worker.InvalidShareCount</td>
-                                <td class="text-right">@worker.Software @worker.SoftwareVersion</td>
+                                <td class="text-right">@worker.ValidShareCount</td>
+                                <td class="hidden-xs text-right">@worker.InvalidShareCount</td>
+                                <td class="hidden-xs text-right">@worker.Software @worker.SoftwareVersion</td>
                             </tr>
                         }
                     </tbody>
