@@ -39,11 +39,11 @@ using Nancy.Helpers;
 
 namespace CoiniumServ.Server.Web.Modules
 {
-    public class PoolModule : NancyModule
+    public class IndexModule : NancyModule
     {
         private const string slug = "MRT";
 
-        public PoolModule(IPoolManager poolManager)
+        public IndexModule(IPoolManager poolManager)
         {
             Get["/"] = _ =>
             {
@@ -57,8 +57,8 @@ namespace CoiniumServ.Server.Web.Modules
                     }];
                 }
 
-                ViewBag.Title = string.Format("{0} Pool", pool.Config.Coin.Name);
-                ViewBag.Heading = string.Format("{0} Pool", pool.Config.Coin.Name);
+                ViewBag.Title = string.Format("{0} Mining Pool", pool.Config.Coin.Name);
+                ViewBag.Heading = string.Format("{0} Mining Pool", pool.Config.Coin.Name);
 
                 // return our view
                 return View["pool", new PoolModel
