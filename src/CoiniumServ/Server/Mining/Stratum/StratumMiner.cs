@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 //     MIT License
 //
@@ -160,7 +160,8 @@ namespace CoiniumServ.Server.Mining.Stratum
         public bool Authenticate(string user, string password)
         {
             Username = user;
-            _minerManager.Authenticate(this);
+            // update username with the one checked in Authenticate method
+            Username = _minerManager.Authenticate(this);
 
             if(!Authenticated)
                 JsonRpcContext.SetException(new AuthenticationError(Username));

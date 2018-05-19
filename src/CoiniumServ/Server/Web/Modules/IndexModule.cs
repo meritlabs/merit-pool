@@ -313,7 +313,7 @@ namespace CoiniumServ.Server.Web.Modules
                     }];
                 }
 
-                var account = (IAccount)pool.AccountManager.GetAccountByUsername(_.username);
+                var account = (IAccount)pool.AccountManager.GetAccountByUsernameOrAddress(_.username);
 
                 if (account == null)
                 {
