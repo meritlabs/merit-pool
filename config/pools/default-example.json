@@ -1,7 +1,6 @@
 {
     # default pool configuration
     # if a per-pool config file doesn't override a setting, default value from this file will be applied
-
     # -------------------------------
     # Coin Daemon RPC Connection
     # -------------------------------
@@ -30,11 +29,9 @@
 
     # interval: interval in seconds that payment-processor will be running.
     # minimum:  minimum amount of coins before a miner is eligable for getting a payment.
-    # validateAddress: set true to validate miner address against the coin daemon on each payout.
-
 	"payments": {
         "interval": 60,
-		"minimum": 0.01,
+        "minimum": 0.01,
         "validateAddress": false
 	},
 
@@ -112,7 +109,6 @@
 
     # hybrid storage layer
     # enabled: set this true to enable hybrid storage mode where redis and mysql is used together.
-
     # mpos layer
     # enabled: set this true to enable mpos compatibility mode - make sure to internal disable payment-processor!
 
