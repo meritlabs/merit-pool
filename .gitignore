@@ -114,3 +114,5 @@ Thumbs.db
 build/.vs/*
 .vs/*
 .vscode
+
+config/config.json
