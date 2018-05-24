@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 //     MIT License
 //
@@ -173,6 +173,9 @@ namespace CoiniumServ.Shares
                     break;
                 case ShareError.NTimeOutOfRange:
                     exception = new OtherError("nTime out of range");
+                    break;
+                case ShareError.IncorrectCycle:
+                    exception = new OtherError("Incorrect cycle");
                     break;
             }
             JsonRpcContext.SetException(exception); // set the stratum exception within the json-rpc reply.

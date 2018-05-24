@@ -45,7 +45,7 @@ namespace CoiniumServ.Utils.Helpers
             var index = 0;
             double rate = hashrate;
 
-            var units = new[] {"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s", "EH/s", "ZH/s", "YH/s"};
+            var units = new[] {"C/s", "KC/s", "MC/s", "GC/s", "TC/s", "PC/s", "EC/s", "ZC/s", "YC/s"};
 
             while (rate > 1000) {
                 rate = rate/1000;
