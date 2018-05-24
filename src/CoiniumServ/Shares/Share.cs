@@ -247,9 +247,13 @@ namespace CoiniumServ.Shares
 
             CycleHash = Job.HashAlgorithm.Hash(CycleBuffer);
             CycleValue = new BigInteger(CycleHash);
+            var _logger = Log.ForContext<Share>();
+
 
             // calculate the share difficulty
             Difficulty = ((double)new BigRational(AlgorithmManager.Diff1, CycleValue)) * Job.HashAlgorithm.Multiplier;
+
+            _logger.Debug("\n\tCycleHash: {0}\n\tshare diff: {1}\n\tminer diff: {2}", CycleHash.ReverseBuffer().ToHexString(), Difficulty, miner.Difficulty);
 
             // calculate the block difficulty
             BlockDiffAdjusted = Job.Difficulty * Job.HashAlgorithm.Multiplier;
@@ -265,13 +269,18 @@ namespace CoiniumServ.Shares
                 IsBlockCandidate = false;
 
                 // Check if share difficulty reaches miner difficulty.
-                var lowDifficulty = Difficulty/miner.Difficulty < 0.99; // share difficulty should be equal or more then miner's target difficulty.
+                var lowDifficulty = Difficulty / miner.Difficulty < 0.99; // share difficulty should be equal or more then miner's target difficulty.
 
-                if (!lowDifficulty) // if share difficulty is high enough to match miner's current difficulty.
+
+                if (!lowDifficulty) { // if share difficulty is high enough to match miner's current difficulty.
+                    _logger.Debug("\tnot lowdifficulty");
                     return; // just accept the share.
+                }
 
-                if (Difficulty >= miner.PreviousDifficulty) // if the difficulty matches miner's previous difficulty before the last vardiff triggered difficulty change
+                if (miner.PreviousDifficulty > 0 && Difficulty >= miner.PreviousDifficulty) {// if the difficulty matches miner's previous difficulty before the last vardiff triggered difficulty change
+                    _logger.Debug("\tprevdiff lower; diff >= prevdiff: {0}::{1}", Difficulty, miner.PreviousDifficulty);
                     return; // still accept the share.
+                }
 
                 // if the share difficulty can't match miner's current difficulty or previous difficulty
                 Error = ShareError.LowDifficultyShare; // then just reject the share with low difficult share error.

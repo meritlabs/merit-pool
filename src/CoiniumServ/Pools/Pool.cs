@@ -179,7 +179,7 @@ namespace CoiniumServ.Pools
                 HashAlgorithm = _objectFactory.GetHashAlgorithm(Config.Coin);
                 // clculated empirically
                 // TODO: check this value and update if necessary
-                _shareMultiplier = 36;
+                _shareMultiplier = Math.Pow(2, 1);
                 return true;
             }
             catch (TinyIoCResolutionException)

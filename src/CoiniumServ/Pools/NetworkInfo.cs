@@ -149,7 +149,7 @@ namespace CoiniumServ.Pools
                 var miningInfo = _daemonClient.GetMiningInfo();
 
                 // read data.
-                Hashrate = miningInfo.NetworkHashPerSec;
+                Hashrate = miningInfo.NetworkCyclesPerSec;
                 Difficulty = miningInfo.Difficulty;
                 DifficultyEdgeBits = miningInfo.DifficultyEdgeBits;
                 Round = miningInfo.Blocks + 1;
