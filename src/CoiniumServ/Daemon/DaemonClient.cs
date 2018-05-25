@@ -691,10 +691,13 @@ namespace CoiniumServ.Daemon
         /// <param name="toBitcoinAddress">A dictionary of address to send bitcoins to. The key is the address, the value is the amount of bitcoins to send.</param>
         /// <param name="minConf"></param>
         /// <param name="comment">A comment to provide with the transaction.</param>
+        /// <param name="data">Data string to add to the transaction as nulldata output.</param>
         /// <returns>The transaction ID if succesful.</returns>
-        public string SendMany(string fromAccount, Dictionary<string, decimal> toBitcoinAddress, int minConf = 1, string comment = "")
+        public string SendMany(string fromAccount, Dictionary<string, decimal> toBitcoinAddress, int minConf = 1, string comment = "", string data = "")
         {
-            return MakeRequest<string>("sendmany", fromAccount, toBitcoinAddress, minConf, comment);
+            // "UNSET" is a default estimate_mode parameter in meritd.
+            // setting it to null gives an error "JSON value is not a string as expected"
+            return MakeRequest<string>("sendmany", fromAccount, toBitcoinAddress, minConf, comment, null, null, null, "UNSET", data);
         }
 
         /// <summary>

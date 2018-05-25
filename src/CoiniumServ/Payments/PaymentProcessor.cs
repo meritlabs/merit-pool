@@ -156,7 +156,7 @@ namespace CoiniumServ.Payments
                 var outputs = filtered.ToDictionary(x => x.Key, x => x.Value.Sum(y => y.Payment.Amount));
 
                 // send the payments all-together.
-                var txHash = _daemonClient.SendMany(string.Empty, outputs);
+                var txHash = _daemonClient.SendMany(string.Empty, outputs, 1, "", "MeritPool");
 
                 // loop through all executed payments
                 filtered.ToList().ForEach(x => x.Value.ForEach(y =>
