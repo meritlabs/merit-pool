@@ -203,6 +203,9 @@ namespace CoiniumServ.Server.Mining.Stratum
                     case "merit-miner":
                         Software = MinerSoftware.MeritMiner;
                         break;
+                    case "DLW":
+                        Software = MinerSoftware.DesktopLightwallet;
+                        break;
                     default:
                         Software = MinerSoftware.Unknown;
                         break;

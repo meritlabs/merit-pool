@@ -12,6 +12,22 @@
             "site": "https://github.com/meritlabs/merit-miner",
             "download": {
             }
+        },
+        {
+            "name": "Desktop Lightwallet",
+            "version": "1.5.2",
+            "platforms": [
+                "cpu"
+            ],
+            "algorithms": [
+                "cuckoo"
+            ],
+            "site": "https://www.merit.me/get-started/#get-merit-desktop",
+            "download": {
+                "windows": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet%20Setup%201.5.2.exe",
+                "linux": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet-1.5.2_amd64.deb",
+                "macos": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet-1.5.2.dmg"
+            }
         }
     ]
 }

@@ -253,8 +253,6 @@ namespace CoiniumServ.Shares
             // calculate the share difficulty
             Difficulty = ((double)new BigRational(AlgorithmManager.Diff1, CycleValue)) * Job.HashAlgorithm.Multiplier;
 
-            _logger.Debug("\n\tCycleHash: {0}\n\tshare diff: {1}\n\tminer diff: {2}", CycleHash.ReverseBuffer().ToHexString(), Difficulty, miner.Difficulty);
-
             // calculate the block difficulty
             BlockDiffAdjusted = Job.Difficulty * Job.HashAlgorithm.Multiplier;
 
@@ -273,7 +271,6 @@ namespace CoiniumServ.Shares
 
 
                 if (!lowDifficulty) { // if share difficulty is high enough to match miner's current difficulty.
-                    _logger.Debug("\tnot lowdifficulty");
                     return; // just accept the share.
                 }
 
