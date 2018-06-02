@@ -150,30 +150,31 @@ namespace CoiniumServ.Mining
         {
             var username = miner.Username;
 
-            // if username validation is not on just authenticate the miner, else ask the current storage layer to do so.
-            miner.Authenticated = !_poolConfig.Miner.ValidateUsername || _storageLayer.Authenticate(miner);
+            miner.Account = _accountManager.GetAccountByUsernameOrAddress(username); // query the user.
+            if (miner.Account == null) // if the user doesn't exists check the blockchain
+            {
+                var addressInfo = _daemonClient.ValidateAddress(miner.Username);
 
-            if (!miner.Authenticated) {
-                _logger.Debug("Miner authentication failed: {0:l} [{1:l}]", username, ((IClient) miner).Connection.RemoteEndPoint);
-                return username;
+                // if username validation is not on just authenticate the miner, else ask the current storage layer to do so.
+                if (!addressInfo.IsValid || !addressInfo.IsConfirmed) {
+                    _logger.Debug("Miner authentication failed: {0:l} [{1:l}]", username, ((IClient) miner).Connection.RemoteEndPoint);
+                    return username;
+                }
+
+                var address = addressInfo.Address;
+                username = string.IsNullOrEmpty(addressInfo.Alias) ? address : addressInfo.Alias;
+                _accountManager.AddAccount(new Account(-1, username, address)); // create a new one.
+
+                miner.Account = _accountManager.GetAccountByUsername(username); // re-query the newly created record.
             }
+
+            miner.Authenticated = true;
 
             if (miner is IStratumMiner) // if we are handling a stratum-miner, apply stratum specific stuff.
             {
                 var stratumMiner = (IStratumMiner) miner;
                 stratumMiner.SetDifficulty(_poolConfig.Stratum.Diff); // set the initial difficulty for the miner and send it.
                 stratumMiner.SendMessage(_poolConfig.Meta.MOTD); // send the motd.
-            }
-
-            miner.Account = _accountManager.GetAccountByUsernameOrAddress(username); // query the user.
-            if (miner.Account == null) // if the user doesn't exists.
-            {
-                var addressInfo = _daemonClient.ValidateAddress(miner.Username);
-                var address = addressInfo.Address;
-                username = string.IsNullOrEmpty(addressInfo.Alias) ? address : addressInfo.Alias;
-                _accountManager.AddAccount(new Account(-1, username, address)); // create a new one.
-
-                miner.Account = _accountManager.GetAccountByUsername(username); // re-query the newly created record.
             }
 
             username = miner.Account.Username;
