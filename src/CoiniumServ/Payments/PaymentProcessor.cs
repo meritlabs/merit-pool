@@ -110,9 +110,7 @@ namespace CoiniumServ.Payments
                     if (user == null) // if the user doesn't exist
                         continue; // just skip.
 
-                    if (!perUserTransactions.ContainsKey(user.Username)
-                    ) // check if our list of transactions to be executed already contains an entry for the user.
-                    {
+                    if (!perUserTransactions.ContainsKey(user.Username)) {
                         // if not, create an entry that contains the list of transactions for the user.
 
                         // see if user payout address is directly payable from the pool's main daemon connection

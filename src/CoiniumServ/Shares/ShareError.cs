@@ -40,5 +40,6 @@ namespace CoiniumServ.Shares
         DuplicateShare,
         LowDifficultyShare,
         IncorrectCycle,
+        NegativeDifficultyShare,
     }
 }

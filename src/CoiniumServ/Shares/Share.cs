@@ -259,7 +259,14 @@ namespace CoiniumServ.Shares
             // check if block candicate
             if (Job.Target >= CycleValue)
             {
+                if (Difficulty < 0 && miner.Software == MinerSoftware.MeritMiner && miner.SoftwareVersion == new Version("0.1.0")) {
+                    IsBlockCandidate = false;
+                    // if we use merit-miner 0.1.0 diff can be negative
+                    Error = ShareError.NegativeDifficultyShare;
+                    return;
+                }
                 IsBlockCandidate = true;
+
                 BlockHex = Serializers.SerializeBlock(Job, HeaderBuffer, CoinbaseBuffer, CycleBuffer, miner.Pool.Config.Coin.Options.IsProofOfStakeHybrid);
             }
             else
@@ -269,7 +276,6 @@ namespace CoiniumServ.Shares
                 // Check if share difficulty reaches miner difficulty.
                 var lowDifficulty = Difficulty / miner.Difficulty < 0.99; // share difficulty should be equal or more then miner's target difficulty.
 
-
                 if (!lowDifficulty) { // if share difficulty is high enough to match miner's current difficulty.
                     return; // just accept the share.
                 }
@@ -278,6 +284,7 @@ namespace CoiniumServ.Shares
                     _logger.Debug("\tprevdiff lower; diff >= prevdiff: {0}::{1}", Difficulty, miner.PreviousDifficulty);
                     return; // still accept the share.
                 }
+
 
                 // if the share difficulty can't match miner's current difficulty or previous difficulty
                 Error = ShareError.LowDifficultyShare; // then just reject the share with low difficult share error.
