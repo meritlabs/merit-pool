@@ -148,7 +148,7 @@ namespace CoiniumServ.Shares
         private void HandleInvalidShare(IShare share)
         {
             var miner = (IStratumMiner)share.Miner;
-            if (share.Error != ShareError.NegativeDifficultyShare) {
+            if (share.Error != ShareError.NegativeDifficultyShareOutdatedMiner) {
                 miner.InvalidShareCount++;
             } else {
                 _logger.Debug("Got negative share from merit-miner 0.1.0 miner. Skipping");
@@ -172,8 +172,11 @@ namespace CoiniumServ.Shares
                 case ShareError.JobNotFound:
                     exception = new JobNotFoundError(share.JobId);
                     break;
+                case ShareError.NegativeDifficultyShareOutdatedMiner:
+                    exception = new OtherError("Negative share: most likely old merit-miner used");
+                    break;
                 case ShareError.NegativeDifficultyShare:
-                    exception = new OtherError("Negative share. Likely old merit-miner used");
+                    exception = new OtherError("Negative share");
                     break;
                 case ShareError.LowDifficultyShare:
                     exception = new LowDifficultyShare(share.Difficulty);

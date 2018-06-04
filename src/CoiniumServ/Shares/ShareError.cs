@@ -41,5 +41,6 @@ namespace CoiniumServ.Shares
         LowDifficultyShare,
         IncorrectCycle,
         NegativeDifficultyShare,
+        NegativeDifficultyShareOutdatedMiner,
     }
 }

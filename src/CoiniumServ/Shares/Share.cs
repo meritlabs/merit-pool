@@ -89,42 +89,51 @@ namespace CoiniumServ.Shares
             return (node << 1) | uorv;
         }
 
-        private bool checkCycle(byte[] blockHash, byte edgeBits, UInt32[] cycle) {
+        private bool checkCycle() {
             var _logger = Log.ForContext<Share>();
 
-            if (cycle.Length != CYCLE_LENGTH) {
+            if (Cycle.Length != CYCLE_LENGTH) {
                 return false;
             }
 
             var blakeHash = new HMACBlake2B(256);
-            byte[] keys = blakeHash.ComputeHash(Encoding.ASCII.GetBytes(blockHash.ToHexString()));
+            byte[] keys = blakeHash.ComputeHash(Encoding.ASCII.GetBytes(BlockHash.ToHexString()));
 
             UInt64 k0 = (UInt64) BitConverter.ToInt64(keys.Slice(0, 8), 0).LittleEndian();
             UInt64 k1 = (UInt64) BitConverter.ToInt64(keys.Slice(8, 16), 0).LittleEndian();
 
-            UInt32 edgeMask = (UInt32) (1 << edgeBits) - 1;
+            UInt32 edgeMask = (UInt32) (1 << Job.EdgeBits) - 1;
 
             UInt32[] uvs = new UInt32[2 * CYCLE_LENGTH];
             UInt32 xor0 = 0;
             UInt32 xor1 = 0;
 
             for (var n = 0; n < CYCLE_LENGTH; n++) {
-                if (cycle[n] > edgeMask) {
+                if (Cycle[n] > edgeMask) {
                     _logger.Error("POW_TOO_BIG");
                     return false;
                 }
 
-                if (n > 0 && cycle[n] <= cycle[n - 1]) {
+                if (n > 0 && Cycle[n] <= Cycle[n - 1]) {
                     _logger.Error("POW_TOO_SMALL");
                     return false;
                 }
 
-                xor0 ^= uvs[2 * n] = sipnode(k0, k1, edgeMask, cycle[n], 0);
-                xor1 ^= uvs[2 * n + 1] = sipnode(k0, k1, edgeMask, cycle[n], 1);
+                xor0 ^= uvs[2 * n] = sipnode(k0, k1, edgeMask, Cycle[n], 0);
+                xor1 ^= uvs[2 * n + 1] = sipnode(k0, k1, edgeMask, Cycle[n], 1);
             }
 
             // matching endpoints imply zero xors
             if ((xor0 | xor1) != 0) {
+                var cycleStr = "";
+                foreach (var edge in Cycle) {
+                    cycleStr += edge.ToString("x") + ",";
+                }
+                cycleStr = cycleStr.Remove(cycleStr.Length - 1);
+
+                _logger.Debug("Block hash: {0}", BlockHash.ToHexString());
+                _logger.Debug("Cycle: {0}", cycleStr);
+
                 _logger.Error("POW_NON_MATCHING");
                 return false;
             }
@@ -230,10 +239,12 @@ namespace CoiniumServ.Shares
             HeaderValue = new BigInteger(HeaderHash);
             BlockHash = HeaderBuffer.DoubleDigest().ReverseBuffer();
 
-            if (!checkCycle(BlockHash, job.EdgeBits, Cycle)) {
+            if (!checkCycle()) {
                 Error = ShareError.IncorrectCycle;
                 return;
             }
+
+            var _logger = Log.ForContext<Share>();
 
             using (var stream = new MemoryStream())
             {
@@ -247,8 +258,6 @@ namespace CoiniumServ.Shares
 
             CycleHash = Job.HashAlgorithm.Hash(CycleBuffer);
             CycleValue = new BigInteger(CycleHash);
-            var _logger = Log.ForContext<Share>();
-
 
             // calculate the share difficulty
             Difficulty = ((double)new BigRational(AlgorithmManager.Diff1, CycleValue)) * Job.HashAlgorithm.Multiplier;
@@ -259,10 +268,14 @@ namespace CoiniumServ.Shares
             // check if block candicate
             if (Job.Target >= CycleValue)
             {
-                if (Difficulty < 0 && miner.Software == MinerSoftware.MeritMiner && miner.SoftwareVersion == new Version("0.1.0")) {
+                if (Difficulty < 0) {
                     IsBlockCandidate = false;
-                    // if we use merit-miner 0.1.0 diff can be negative
-                    Error = ShareError.NegativeDifficultyShare;
+                    if (miner.Software == MinerSoftware.MeritMiner && miner.SoftwareVersion == new Version("0.1.0")) {
+                        // if we use merit-miner 0.1.0 diff can be negative
+                        Error = ShareError.NegativeDifficultyShareOutdatedMiner;
+                    } else {
+                        Error = ShareError.NegativeDifficultyShare;
+                    }
                     return;
                 }
                 IsBlockCandidate = true;

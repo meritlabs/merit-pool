@@ -38,6 +38,6 @@ namespace CoiniumServ.Mining
         CudaMiner,
         CPUMiner,
         MeritMiner,
-        DesktopLightwallet,
+        DLW,
     }
 }
