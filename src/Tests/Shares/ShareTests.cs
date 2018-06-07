@@ -5,7 +5,7 @@
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Copyright (C) 2017-2018 The Merit Foundation
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
 //
-#endregion
 #endregion
 
 using System;
