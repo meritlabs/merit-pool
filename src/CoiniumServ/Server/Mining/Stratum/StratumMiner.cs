@@ -159,7 +159,7 @@ namespace CoiniumServ.Server.Mining.Stratum
         /// <returns></returns>
         public bool Authenticate(string user, string password)
         {
-            Username = user;
+            Username = user.Trim('@');
             // update username with the one checked in Authenticate method
             Username = _minerManager.Authenticate(this);
 
