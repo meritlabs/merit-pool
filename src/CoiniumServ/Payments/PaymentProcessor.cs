@@ -112,15 +112,14 @@ namespace CoiniumServ.Payments
 
                     if (!perUserTransactions.ContainsKey(user.Username)) {
                         // if not, create an entry that contains the list of transactions for the user.
+                        if (_poolConfig.Payments.ValidateAddress) {
+                            // see if user payout address is directly payable from the pool's main daemon connection
+                            // which happens when a user connects an XYZ pool and want his payments in XYZ coin.
+                            var result = _daemonClient.ValidateAddress(user.Address); // does the user have a directly payable address set?
 
-                        // see if user payout address is directly payable from the pool's main daemon connection
-                        // which happens when a user connects an XYZ pool and want his payments in XYZ coin.
-
-                        var result = _daemonClient.ValidateAddress(user.Address); // does the user have a directly payable address set?
-
-                        if (!result.IsValid) // if not skip the payment and let it handled by auto-exchange module.
-                            continue;
-
+                            if (!result.IsValid || !result.IsConfirmed) // if not skip the payment and let it handled by auto-exchange module.
+                                continue;
+                        }
                         perUserTransactions.Add(user.Username, new List<ITransaction>());
                     }
 
