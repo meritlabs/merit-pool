@@ -50,3 +50,7 @@ This version is heavily modified to support Merit and Merit GUI standarts.
 * ✔ Vardiff support
 * ✔ Ban manager (that can handle miners flooding with invalid shares)
 * ✔ Share & Payment processor, Job Manager
+
+##### Running your own pool
+
+Check out [Build Instruction](docs/build.md) and [Running Instruction](docs/running.md) to run your own pool instance.
