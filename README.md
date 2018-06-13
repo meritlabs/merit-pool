@@ -6,7 +6,7 @@ Mining pool implementation for Merit cryptocurrency based on CoiniumServ.
 
 CoiniumServ was created to be used for Coinium.org mining pool network at first hand. You can check [some of pools](https://github.com/bonesoul/CoiniumServ/wiki/Pools) of the pools running CoiniumServ.
 
-This version is heavily modified to support Merit and Merit GUI standarts.
+This version is heavily modified to support Merit and Merit GUI standards.
 
 ### Features
 * __Platform Agnostic__; Unlike other pool-servers, CoiniumServ doesn't dictate platforms and can run on anything including Windows, Linux or MacOS.
