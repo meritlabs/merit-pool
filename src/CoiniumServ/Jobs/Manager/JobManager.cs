@@ -119,8 +119,10 @@ namespace CoiniumServ.Jobs.Manager
             {
                 var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired, _poolConfig.Wallet.Address);
 
-                if (blockTemplate.Height == _jobTracker.Current.Height) // if network reports the same block-height with our current job.
+                if (blockTemplate.Height == _jobTracker.Current.Height) { // if network reports the same block-height with our current job.
+                    _blockPollerTimer.Change(_poolConfig.Job.BlockRefreshInterval, Timeout.Infinite); // reset the block-poller timer so we can keep polling.
                     return; // just return.
+                }
 
                 _logger.Verbose("A new block {0} emerged in network, rebroadcasting new work", blockTemplate.Height);
                 CreateAndBroadcastNewJob(false); // broadcast a new job.
