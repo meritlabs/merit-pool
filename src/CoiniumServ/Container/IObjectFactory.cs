@@ -69,8 +69,6 @@ namespace CoiniumServ.Container
 
         ILogManager GetLogManager();
 
-        IDaemonManager GetPaymentDaemonManager();
-
         #endregion
 
         #region pool objects

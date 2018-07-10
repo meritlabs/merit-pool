@@ -202,7 +202,6 @@
     <Compile Include="Daemon\Converters\TimeConverter.cs" />
     <Compile Include="Daemon\DaemonBase.cs" />
     <Compile Include="Daemon\DaemonClient.cs" />
-    <Compile Include="Daemon\DaemonManager.cs" />
     <Compile Include="Daemon\DaemonRequest.cs" />
     <Compile Include="Daemon\DaemonResponse.cs" />
     <Compile Include="Daemon\Errors\RpcError.cs" />
@@ -216,7 +215,6 @@
     <Compile Include="Daemon\Exceptions\RpcTimeoutException.cs" />
     <Compile Include="Daemon\IDaemonBase.cs" />
     <Compile Include="Daemon\IDaemonClient.cs" />
-    <Compile Include="Daemon\IDaemonManager.cs" />
     <Compile Include="Daemon\Requests\CreateRawTransaction.cs" />
     <Compile Include="Daemon\Requests\CreateRawTransactionInput.cs" />
     <Compile Include="Daemon\Requests\SignRawTransaction.cs" />

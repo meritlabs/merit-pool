@@ -99,11 +99,6 @@ namespace CoiniumServ.Container
             return _applicationContext.Container.Resolve<ILogManager>();
         }
 
-        public IDaemonManager GetPaymentDaemonManager()
-        {
-            return _applicationContext.Container.Resolve<IDaemonManager>();
-        }
-
         #endregion
 
         #region pool objects

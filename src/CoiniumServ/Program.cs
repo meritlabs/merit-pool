@@ -93,9 +93,6 @@ namespace CoiniumServ
             // run algorithm manager.
             objectFactory.GetAlgorithmManager();
 
-            // run payment manager
-            objectFactory.GetPaymentDaemonManager();
-
             // run statistics manager.
             objectFactory.GetStatisticsManager();
 
