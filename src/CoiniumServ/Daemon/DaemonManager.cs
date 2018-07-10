@@ -76,7 +76,7 @@ namespace CoiniumServ.Daemon
 
         public IEnumerator<IDaemonClient> GetEnumerator()
         {
-            return _storage.Values.GetEnumerator();
+            return _storage.Values.ToList().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -86,17 +86,17 @@ namespace CoiniumServ.Daemon
 
         public IQueryable<IDaemonClient> SearchFor(Expression<Func<IDaemonClient, bool>> predicate)
         {
-            return _storage.Values.AsQueryable().Where(predicate);
+            return _storage.Values.ToList().AsQueryable().Where(predicate);
         }
 
         public IEnumerable<IDaemonClient> GetAll()
         {
-            return _storage.Values;
+            return _storage.Values.ToList();
         }
 
         public IQueryable<IDaemonClient> GetAllAsQueryable()
         {
-            return _storage.Values.AsQueryable();
+            return _storage.Values.ToList().AsQueryable();
         }
 
         public IReadOnlyCollection<IDaemonClient> GetAllAsReadOnly()
