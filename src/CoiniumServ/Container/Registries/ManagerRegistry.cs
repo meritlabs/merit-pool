@@ -59,7 +59,6 @@ namespace CoiniumServ.Container.Registries
             _applicationContext.Container.Register<IConfigManager, ConfigManager>().AsSingleton();
             _applicationContext.Container.Register<IStatisticsManager, StatisticsManager>().AsSingleton();
             _applicationContext.Container.Register<ILogManager, LogManager>().AsSingleton();
-            _applicationContext.Container.Register<IDaemonManager, DaemonManager>().AsSingleton();
             _applicationContext.Container.Register<ISoftwareRepository, SoftwareRepository>().AsSingleton();
 
             // per-pool managers
