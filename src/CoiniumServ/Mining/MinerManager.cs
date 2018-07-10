@@ -43,9 +43,23 @@ namespace CoiniumServ.Mining
 {
     public class MinerManager : IMinerManager
     {
-        public int Count { get { return _miners.Count(kvp => kvp.Value.Authenticated); } }
+        public int Count 
+        { 
+            get 
+            { 
+                lock(_minersLock)
+                    return _miners.Count(kvp => kvp.Value.Authenticated); 
+            } 
+        }
 
-        public IList<IMiner> Miners { get { return _miners.Values.ToList(); } }
+        public IList<IMiner> Miners 
+        { 
+            get 
+            { 
+                lock(_minersLock)
+                    return _miners.Values.ToList(); 
+            } 
+        }
 
         public event EventHandler MinerAuthenticated;
 
@@ -86,10 +100,11 @@ namespace CoiniumServ.Mining
 
         public IMiner GetByConnection(IConnection connection)
         {
-            return (from pair in _miners  // returned the miner associated with the given connection.
-                let client = (IClient) pair.Value
-                where client.Connection == connection
-                select pair.Value).FirstOrDefault();
+            lock(_minersLock)
+                return (from pair in _miners  // returned the miner associated with the given connection.
+                        let client = (IClient) pair.Value
+                        where client.Connection == connection
+                        select pair.Value).FirstOrDefault();
         }
 
         public T Create<T>(IPool pool) where T : IGetworkMiner
@@ -134,16 +149,20 @@ namespace CoiniumServ.Mining
         public void Remove(IConnection connection)
         {
             // find the miner associated with the connection.
-            var miner = (from pair in _miners
-                let client = (IClient) pair.Value
-                where client.Connection == connection
-                select pair.Value).FirstOrDefault();
 
-            if (miner == null) // make sure the miner exists
-                return;
+            // lock the list before we read or modify the collection.
+            lock (_minersLock) 
+            {
+                var miner = (from pair in _miners
+                        let client = (IClient) pair.Value
+                        where client.Connection == connection
+                        select pair.Value).FirstOrDefault();
 
-            lock (_minersLock) // lock the list before we modify the collection.
+                if (miner == null) // make sure the miner exists
+                    return;
+
                 _miners.Remove(miner.Id); // remove the miner.
+            }
         }
 
         public string Authenticate(IMiner miner)
