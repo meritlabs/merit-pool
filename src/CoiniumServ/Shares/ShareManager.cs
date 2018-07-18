@@ -257,6 +257,11 @@ namespace CoiniumServ.Shares
                 _logger.Debug("We thought a block was found but it was rejected by the coin daemon; [{0:l}] - reason; {1:l}", share.BlockHash.ToHexString(), e.Message);
                 return false;
             }
+            catch (Exception e)
+            {
+                _logger.Debug("We thought a block was found but it was rejected by the coin daemon; [{0:l}] - reason; {1:l}", share.BlockHash.ToHexString(), e.Message);
+                return false;
+            }
         }
 
         private void OnBlockFound(EventArgs e)

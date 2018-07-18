@@ -132,22 +132,24 @@ namespace CoiniumServ.Daemon
         /// <returns>The HTTP request object.</returns>
         private HttpWebRequest MakeHttpRequest(DaemonRequest walletRequest)
         {
-            var webRequest = (HttpWebRequest)WebRequest.Create(RpcUrl);
-            webRequest.Credentials = new NetworkCredential(RpcUser, RpcPassword);
-
-            // Important, otherwise the service can't deserialse your request properly
-            webRequest.UserAgent = string.Format("CoiniumServ {0:} {1:}", VersionInfo.CodeName, Assembly.GetAssembly(typeof(Program)).GetName().Version);
-            webRequest.ContentType = "application/json-rpc";
-            webRequest.Method = "POST";
-            webRequest.Timeout = _timeout;
-
-            _logger.Verbose("tx: {0}", Encoding.UTF8.GetString(walletRequest.GetBytes()).PrettifyJson());
-
-            byte[] byteArray = walletRequest.GetBytes();
-            webRequest.ContentLength = byteArray.Length;
+            HttpWebRequest webRequest = null;
 
             try
             {
+                webRequest = (HttpWebRequest)WebRequest.Create(RpcUrl);
+                webRequest.Credentials = new NetworkCredential(RpcUser, RpcPassword);
+
+                // Important, otherwise the service can't deserialse your request properly
+                webRequest.UserAgent = string.Format("CoiniumServ {0:} {1:}", VersionInfo.CodeName, Assembly.GetAssembly(typeof(Program)).GetName().Version);
+                webRequest.ContentType = "application/json-rpc";
+                webRequest.Method = "POST";
+                webRequest.Timeout = _timeout;
+
+                _logger.Verbose("tx: {0}", Encoding.UTF8.GetString(walletRequest.GetBytes()).PrettifyJson());
+
+                byte[] byteArray = walletRequest.GetBytes();
+                webRequest.ContentLength = byteArray.Length;
+
                 using (Stream dataStream = webRequest.GetRequestStream())
                 {
                     dataStream.Write(byteArray, 0, byteArray.Length);
@@ -175,15 +177,15 @@ namespace CoiniumServ.Daemon
         /// <returns>A JSON RPC response with the result deserialized as the given type.</returns>
         private DaemonResponse<T> GetRpcResponse<T>(HttpWebRequest httpWebRequest)
         {
-            string json = GetJsonResponse(httpWebRequest);
-
-            // process response with converter. needed for all coin wallets which gives non-standard info.
-            string jsonLC = PropertyConverter.DeserializeWithLowerCasePropertyNames(json).ToString();
-
-            _logger.Verbose("rx: {0}", jsonLC.PrettifyJson());
-
             try
             {
+                string json = GetJsonResponse(httpWebRequest);
+
+                // process response with converter. needed for all coin wallets which gives non-standard info.
+                string jsonLC = PropertyConverter.DeserializeWithLowerCasePropertyNames(json).ToString();
+
+                _logger.Verbose("rx: {0}", jsonLC.PrettifyJson());
+
                 return JsonConvert.DeserializeObject<DaemonResponse<T>>(jsonLC);
             }
             catch (JsonException jsonEx)
@@ -266,11 +268,12 @@ namespace CoiniumServ.Daemon
 
                 using (var reader = new StreamReader(stream))
                 {
-                    string data = reader.ReadToEnd(); // read the error response.
-
-                    // we actually expect a json error response here, but it seems some coins may return non-json responses.
+                    string data = "";
                     try
                     {
+                        data = reader.ReadToEnd(); // read the error response.
+
+                        // we actually expect a json error response here, but it seems some coins may return non-json responses.
                         var error = JsonConvert.DeserializeObject<RpcErrorResponse>(data); // so let's try parsing the error response as json.    
                         return error;
                     }
