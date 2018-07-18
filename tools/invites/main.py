@@ -13,7 +13,8 @@ INVITES_PER_BLOCK = 10
 # Parse arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--days", required=True, help="length of period(in days) to collect data about invites")
-ap.add_argument("-f", "--filename", required=False, help="Filename to store results (.csv format)", default="mempool_invites.csv")
+ap.add_argument("-f", "--filename", required=False, help="Filename to store results (.csv format)",
+                default="mempool_invites.csv")
 args = vars(ap.parse_args())
 
 
@@ -92,11 +93,13 @@ def get_total_invites_in_mempool():
     :rtype: int
     """
 
-    invites_in_mempool = json.loads((subprocess.check_output(['merit-cli',
-                                                              '-conf=/home/andrew/merit-livenet/merit.conf',
-                                                              'getaddressbalance',
-                                                              '{"addresses":["MEpuLtAoXayZAst1EYtnrTzjc9bfqf49kj"], "invites":true}']))
-                                    .decode("utf-8"))
+    invites_in_mempool = json.loads(
+        (subprocess.check_output(['merit-cli',
+                                  '-conf={}'.format(config.MERIT_CONF),
+                                  '-datadir={}'.format(config.MERIT_DATA_DIR),
+                                  'getaddressbalance',
+                                  '{"addresses":["' + config.MERIT_MEMPOOL_ADDRESS + '"], "invites":true}']))
+            .decode("utf-8"))
 
     return invites_in_mempool['balance']
 
@@ -111,7 +114,8 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
     :return: map (address -> number of invites)
     """
 
-    invites_to_dist = free_invites_in_mempool if (free_invites_in_mempool < number_of_blocks * INVITES_PER_BLOCK) else number_of_blocks * INVITES_PER_BLOCK
+    invites_to_dist = free_invites_in_mempool if (
+            free_invites_in_mempool < number_of_blocks * INVITES_PER_BLOCK) else number_of_blocks * INVITES_PER_BLOCK
 
     cpayments = copy.copy(payments)
     total_payments = sum(payment[1] for payment in cpayments)
