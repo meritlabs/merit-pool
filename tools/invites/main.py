@@ -133,6 +133,6 @@ if __name__ == "__main__":
 
     # Save results to .cvs file
     with open(args["filename"], 'w') as f:
-        [f.write('{0},{1}\n'.format(key, value)) for key, value in invites_per_address.items()]
+        [f.write('{0},{1}\n'.format(key, value)) if (value > 0) else '' for key, value in invites_per_address.items()]
 
     mysql_conn.close()
