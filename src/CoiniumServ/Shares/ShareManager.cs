@@ -207,7 +207,10 @@ namespace CoiniumServ.Shares
                 var block = _daemonClient.GetBlock(share.BlockHash.ToHexString()); // query the block.
 
                 if (block == null) // make sure the block exists
+                {
+                    _logger.Debug("Submitted block [{0}] cannot be found with getblock; [{1}]", share.BlockHash.ToHexString(), block.Hash);
                     return false;
+                }
 
                 if (block.Confirmations == -1) // make sure the block is accepted.
                 {
