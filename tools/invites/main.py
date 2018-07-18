@@ -122,7 +122,7 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
 
     invites_per_address = {}
     for payment in payments:
-        invites_per_address[payment[4]] = int(float(payment[1] / total_payments) * invites_to_dist)
+        invites_per_address[payment[4]] = round(float(payment[1] / total_payments) * invites_to_dist)
 
     return invites_per_address
 
