@@ -3,6 +3,7 @@ import json
 import config
 import argparse
 import subprocess
+import operator
 import pymysql
 
 from datetime import datetime
@@ -111,18 +112,32 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
     :param payments: accelerated object with number payments for person for period(n days)
     :param number_of_blocks: generated and processed blocks for the last n days
     :param free_invites_in_mempool: number of free(collected) invites in the mempool
-    :return: map (address -> number of invites)
+    :return: list[ tuple(address, number_of_invites), ... ]
     """
 
-    invites_to_dist = free_invites_in_mempool if (
+    available_invites_to_dist = free_invites_in_mempool if (
             free_invites_in_mempool < number_of_blocks * INVITES_PER_BLOCK) else number_of_blocks * INVITES_PER_BLOCK
 
-    cpayments = copy.copy(payments)
-    total_payments = sum(payment[1] for payment in cpayments)
+    copypayments = copy.copy(payments)
+    total_payments = sum(payment[1] for payment in copypayments)
 
+    total_invites_to_share = 0
     invites_per_address = {}
     for payment in payments:
-        invites_per_address[payment[4]] = round(float(payment[1] / total_payments) * invites_to_dist)
+        val = round(float(payment[1] / total_payments) * available_invites_to_dist)
+        invites_per_address[payment[4]] = val
+
+        total_invites_to_share += val
+
+    invites_per_address = sorted(invites_per_address.items(), key=operator.itemgetter(1), reverse=True)
+
+    # If after rounding we need more invites then there are available, then "cut" top guys
+    if total_invites_to_share > available_invites_to_dist:
+        # The number of invites that are missing
+        need = total_invites_to_share - available_invites_to_dist
+
+        for i in range(need):
+            invites_per_address[i][1] -= 1
 
     return invites_per_address
 
@@ -137,6 +152,6 @@ if __name__ == "__main__":
 
     # Save results to .cvs file
     with open(args["filename"], 'w') as f:
-        [f.write('{0},{1}\n'.format(key, value)) if (value > 0) else '' for key, value in invites_per_address.items()]
+        [f.write('{0},{1}\n'.format(item[0], item[1])) if (item[1] > 0) else '' for item in invites_per_address]
 
     mysql_conn.close()
