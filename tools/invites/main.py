@@ -122,14 +122,13 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
     total_payments = sum(payment[1] for payment in copypayments)
 
     total_invites_to_share = 0
-    invites_per_address = {}
+    invites_per_address = []
     for payment in payments:
         val = round(float(payment[1] / total_payments) * available_invites_to_dist)
-        invites_per_address[payment[4]] = val
-
+        invites_per_address.append([payment[4], val])
         total_invites_to_share += val
 
-    invites_per_address = sorted(invites_per_address.items(), key=operator.itemgetter(1), reverse=True)
+    invites_per_address = sorted(invites_per_address, key=operator.itemgetter(1), reverse=True)
 
     # If after rounding we need more invites then there are available, then "cut" top guys
     if total_invites_to_share > available_invites_to_dist:
