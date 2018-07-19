@@ -142,7 +142,7 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
     return invites_per_address
 
 
-if __name__ == "__main__":
+def process_invites():
     mysql_conn = connect_to_mysql()
     payments = get_payments(mysql_conn, int(args["days"]))
     number_of_blocks = get_numbers_of_blocks(mysql_conn, int(args["days"]))
@@ -155,3 +155,7 @@ if __name__ == "__main__":
         [f.write('{0},{1}\n'.format(item[0], item[1])) if (item[1] > 0) else '' for item in invites_per_address]
 
     mysql_conn.close()
+
+
+if __name__ == "__main__":
+    process_invites()
