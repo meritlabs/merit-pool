@@ -6,14 +6,10 @@ import subprocess
 import operator
 import pymysql
 
-from datetime import datetime
-from datetime import timedelta
-
 INVITES_PER_BLOCK = 10
 
 # Parse arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-d", "--days", required=True, help="length of period(in days) to collect data about invites")
 ap.add_argument("-f", "--filename", required=False, help="Filename to store results (.csv format)",
                 default="mempool_invites.csv")
 args = vars(ap.parse_args())
@@ -36,23 +32,18 @@ def connect_to_mysql():
     return conn
 
 
-def get_numbers_of_blocks(connection, days):
+def get_numbers_of_blocks(connection):
     """
     Get number of generated and processed blocks for the last n days(argument)
 
     :param connection: pymysql.Connection
-    :param days: number of days to search for
 
     :return: number of blocks
     :rtype: int
     """
 
     cur = connection.cursor()
-    last_date = datetime.now() - timedelta(days=days)
-    last_date = last_date.strftime('%Y-%m-%d %H:%M:%S')
-
-    cur.execute("SELECT COUNT(*) FROM Block "
-                "WHERE CreatedAt > '{}' ".format(last_date))
+    cur.execute("SELECT COUNT(*) FROM Block ")
 
     for row in cur:
         number = row[0]
@@ -60,25 +51,19 @@ def get_numbers_of_blocks(connection, days):
         return number
 
 
-def get_payments(connection, days):
+def get_payments(connection):
     """
     Get payments for users(for the last n days)
 
     :param connection: pymysql.Connection
-    :param days: number of days to search for
     :return: accelerated object with number payments for person for period(n days)
-    :rtype: object
     """
 
     cur = connection.cursor()
-    last_date = datetime.now() - timedelta(days=days)
-    last_date = last_date.strftime('%Y-%m-%d %H:%M:%S')
-
     cur.execute("SELECT AccountId, sum(Amount), COUNT(*) AS 'number_of_payments', Username, Address "
                 "FROM Payment "
                 "INNER JOIN Account "
                 "On AccountId = Account.Id "
-                "WHERE Payment.CreatedAt > '{}' ".format(last_date) +
                 "GROUP BY AccountId;")
 
     payments = cur
@@ -133,7 +118,7 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
     # If after rounding we need more invites then there are available, then "cut" top guys
     if total_invites_to_share > available_invites_to_dist:
         # The number of invites that are missing
-        need = total_invites_to_share - available_invites_to_dist
+        need = int(total_invites_to_share - available_invites_to_dist)
 
         for i in range(need):
             invites_per_address[i][1] -= 1
@@ -143,15 +128,15 @@ def get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
 
 def process_invites():
     mysql_conn = connect_to_mysql()
-    payments = get_payments(mysql_conn, int(args["days"]))
-    number_of_blocks = get_numbers_of_blocks(mysql_conn, int(args["days"]))
+    payments = get_payments(mysql_conn)
+    number_of_blocks = get_numbers_of_blocks(mysql_conn)
     free_invites_in_mempool = get_total_invites_in_mempool()
 
     invites_per_address = get_invites_per_address(payments, number_of_blocks, free_invites_in_mempool)
 
     # Save results to .cvs file
     with open(args["filename"], 'w') as f:
-        [f.write('{0},{1}\n'.format(item[0], item[1])) if (item[1] > 0) else '' for item in invites_per_address]
+        [f.write('{0},{1}\n'.format(item[0], item[1])) if item[1] > 0 else '' for item in invites_per_address]
 
     mysql_conn.close()
 
