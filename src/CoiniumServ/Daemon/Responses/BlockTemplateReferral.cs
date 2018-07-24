@@ -47,7 +47,7 @@ namespace CoiniumServ.Daemon.Responses
         /// other transactions before this one (by 1-based index in "transactions" list) that must be present in the final block if this one is;
         /// if key is not present, dependencies are unknown and clients MUST NOT assume there aren't any
         /// </summary>
-        public int[] Depends { get; set; }
+        public string[] Depends { get; set; }
 
         /// <summary>
         /// hash/id encoded in little-endian hexadecimal
