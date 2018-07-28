@@ -52,5 +52,18 @@ namespace CoiniumServ.Persistance.Providers.Redis
         /// redis database instance id
         /// </summary>
         int DatabaseId { get; }
+
+        /// <summary>
+        /// ResponseTimeout is the number of ms before we treat the connection as dead - 
+        /// since it's been that long since we've seen activity on the connection and treat it as "stale"
+        /// https://github.com/StackExchange/StackExchange.Redis/issues/235
+        /// </summary>
+        int ResponseTimeout { get; }
+
+        /// <summary>
+        /// SyncTimeout is the amount of time to wait on a specific operation to complete
+        /// https://github.com/StackExchange/StackExchange.Redis/issues/235
+        /// </summary>
+        int SyncTimeout { get; }
     }
 }

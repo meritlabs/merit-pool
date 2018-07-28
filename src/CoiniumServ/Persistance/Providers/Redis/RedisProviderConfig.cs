@@ -40,6 +40,10 @@ namespace CoiniumServ.Persistance.Providers.Redis
         public string Password { get; private set; }
         public int DatabaseId { get; private set; }
 
+        public int ResponseTimeout { get; private set; }
+
+        public int SyncTimeout { get; private set; }
+
         public RedisProviderConfig(dynamic config)
         {
             try
@@ -49,6 +53,8 @@ namespace CoiniumServ.Persistance.Providers.Redis
                 Port = config.port == 0 ? 6379 : config.port;
                 Password = config.password;
                 DatabaseId = config.databaseId;
+                ResponseTimeout = config.responseTimeout == 0 ? 10000 : config.responseTimeout;
+                SyncTimeout = config.syncTimeout == 0 ? 100 : config.syncTimeout;
                 Valid = true;
             }
             catch (Exception e)

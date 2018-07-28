@@ -58,8 +58,8 @@ namespace CoiniumServ.Persistance.Providers.Redis
         {
             try
             {
-
-                Client = new RedisClient(_config.Host, _config.Port, _config.Password, "version=2.6");
+                var connectionParams = "version=4.0,responseTimeout=" + _config.ResponseTimeout + ",syncTimeout=" + _config.SyncTimeout;
+                Client = new RedisClient(_config.Host, _config.Port, _config.Password, connectionParams);
 
                 // select the database
                 Client.Select(_config.DatabaseId);
