@@ -75,7 +75,7 @@ namespace CoiniumServ.Daemon
         /// Make a a request. Invoke the given method with the given parameters.
         /// </summary>
         /// <typeparam name="T">
-        /// Type to return as the response. 
+        /// Type to return as the response.
         /// We will try to convert the JSON response to this type.
         /// </typeparam>
         /// <param name="method">Method to invoke.</param>
@@ -88,7 +88,7 @@ namespace CoiniumServ.Daemon
         }
 
         /// <summary>
-        /// Make an JSON RPC request, and return a JSON RPC response object with the result 
+        /// Make an JSON RPC request, and return a JSON RPC response object with the result
         /// deserialized as the given type.
         /// </summary>
         /// <typeparam name="T">The type to deserialize the result as.</typeparam>
@@ -188,6 +188,10 @@ namespace CoiniumServ.Daemon
 
                 return JsonConvert.DeserializeObject<DaemonResponse<T>>(jsonLC);
             }
+            catch (RpcException rpcEx) {
+                httpWebRequest = null;
+                throw rpcEx;
+            }
             catch (JsonException jsonEx)
             {
                 httpWebRequest = null;
@@ -274,7 +278,7 @@ namespace CoiniumServ.Daemon
                         data = reader.ReadToEnd(); // read the error response.
 
                         // we actually expect a json error response here, but it seems some coins may return non-json responses.
-                        var error = JsonConvert.DeserializeObject<RpcErrorResponse>(data); // so let's try parsing the error response as json.    
+                        var error = JsonConvert.DeserializeObject<RpcErrorResponse>(data); // so let's try parsing the error response as json.
                         return error;
                     }
                     catch (JsonException e) // if we can't parse the error response as json
