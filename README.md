@@ -1,6 +1,6 @@
 # Merit Mining Pool
 
-Mining pool implementation for Merit cryptocurrency based on CoiniumServ.
+Mining pool implementation for [Merit](https://merit.me) cryptocurrency based on CoiniumServ.
 
 **CoiniumServ** is a high performance, extremely efficient, platform-agnostic, easy to setup pool server implementation. It features stratum and vanilla services, reward, payment, share processors, vardiff & ban managers, user-friendly embedded web-server & front-end and a full-stack API.
 
