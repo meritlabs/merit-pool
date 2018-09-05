@@ -26,7 +26,7 @@
                         {
                             <tr>
                                 <td class="hidden-xs">@worker.Id</td>
-                                <td>@worker.Username</td>
+                                <td><a href="/account/username/@worker.Username" />@worker.Username</a></td>
                                 <td class="hidden-xs text-right">
                                     @if (worker is IStratumMiner)
                                     {

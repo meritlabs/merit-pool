@@ -1,22 +1,22 @@
-﻿#region License
-// 
+#region License
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
-// 
+//     Copyright (C) 2017 - 2018 The Merit Foundation
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System.Collections.Generic;
@@ -68,8 +68,8 @@ namespace CoiniumServ.Payments
                 var percent = pair.Value / totalShares;
                 var amount = (decimal)percent * Block.Reward;
 
-                // get the user id for the payment.
-                var user = _accountManager.GetAccountByUsername(pair.Key);
+                // get the user id for the payment. get it by username or address as miner can login with both
+                var user = _accountManager.GetAccountByUsernameOrAddress(pair.Key);
 
                 // if we can't find a user for the given username, just skip.
                 if (user == null)

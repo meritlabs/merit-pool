@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -119,8 +119,10 @@ namespace CoiniumServ.Jobs.Manager
             {
                 var blockTemplate = _daemonClient.GetBlockTemplate(_poolConfig.Coin.Options.BlockTemplateModeRequired, _poolConfig.Wallet.Address);
 
-                if (blockTemplate.Height == _jobTracker.Current.Height) // if network reports the same block-height with our current job.
+                if (blockTemplate.Height == _jobTracker.Current.Height) { // if network reports the same block-height with our current job.
+                    _blockPollerTimer.Change(_poolConfig.Job.BlockRefreshInterval, Timeout.Infinite); // reset the block-poller timer so we can keep polling.
                     return; // just return.
+                }
 
                 _logger.Verbose("A new block {0} emerged in network, rebroadcasting new work", blockTemplate.Height);
                 CreateAndBroadcastNewJob(false); // broadcast a new job.

@@ -21,7 +21,7 @@
                         @foreach (var worker in Model.Shares)
                         {
                             <tr>
-                                <td>@worker.Key</td>
+                                <td><a href="/account/username/@worker.Key">@worker.Key</a></td>
                                 <td class="text-right">@worker.Value</td>
                             </tr>
                         }

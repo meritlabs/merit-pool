@@ -101,6 +101,12 @@
     <Reference Include="StackExchange.Redis, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\StackExchange.Redis.1.2.4\lib\net46\StackExchange.Redis.dll</HintPath>
     </Reference>
+    <Reference Include="Konscious.Security.Cryptography.Blake2, Version=1.0.5, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Konscious.Security.Cryptography.Blake2.1.0.5\lib\net451\Konscious.Security.Cryptography.Blake2.dll</HintPath>
+    </Reference>
+    <Reference Include="CH.SipHash, Version=1.0.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CH.SipHash.1.0.2\lib\net45\CH.SipHash.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -125,6 +131,7 @@
     <Compile Include="Algorithms\IAlgorithmManager.cs" />
     <Compile Include="Algorithms\IHashAlgorithm.cs" />
     <Compile Include="Algorithms\IHashAlgorithmStatistics.cs" />
+    <Compile Include="Algorithms\SipHash.cs" />
     <Compile Include="Algorithms\Implementations\Blake.cs" />
     <Compile Include="Algorithms\Implementations\C11.cs" />
     <Compile Include="Algorithms\Implementations\Cuckoo.cs" />
@@ -195,7 +202,6 @@
     <Compile Include="Daemon\Converters\TimeConverter.cs" />
     <Compile Include="Daemon\DaemonBase.cs" />
     <Compile Include="Daemon\DaemonClient.cs" />
-    <Compile Include="Daemon\DaemonManager.cs" />
     <Compile Include="Daemon\DaemonRequest.cs" />
     <Compile Include="Daemon\DaemonResponse.cs" />
     <Compile Include="Daemon\Errors\RpcError.cs" />
@@ -209,7 +215,6 @@
     <Compile Include="Daemon\Exceptions\RpcTimeoutException.cs" />
     <Compile Include="Daemon\IDaemonBase.cs" />
     <Compile Include="Daemon\IDaemonClient.cs" />
-    <Compile Include="Daemon\IDaemonManager.cs" />
     <Compile Include="Daemon\Requests\CreateRawTransaction.cs" />
     <Compile Include="Daemon\Requests\CreateRawTransactionInput.cs" />
     <Compile Include="Daemon\Requests\SignRawTransaction.cs" />

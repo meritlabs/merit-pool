@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -59,44 +59,16 @@ namespace CoiniumServ.Daemon.Responses
 
         public string Chain { get; set; }
 
-        // coins may report network hash in different fields; networkhashps, networkmhps, netmhashps
-        // we have a member for each of them and then set the actual NetworkHashPerSec in OnDeserializedMethod;
-        // we set NetMHps, NetMHashps, NetworkGhps, NetworkMhps and NetworkHashps as private because we won't to expose them
-        // to outer world but only NetworkHashPerSec.
-
-        [JsonProperty("netmh/s")] // added to support unit and possibly some other coins
-        private double NetMHps { get; set; }
-
         [JsonProperty]
-        private double NetMHashps { get; set; }
-
-        [JsonProperty]
-        private double NetworkGhps { get; set; }
-
-        [JsonProperty]
-        private double NetworkMhps { get; set; }
-
-        [JsonProperty]
-        private double NetworkHashps { get; set; }
+        private double NetworkCyclesps { get; set; }
 
         [JsonIgnore]
-        public double NetworkHashPerSec { get; set; }
+        public double NetworkCyclesPerSec { get; set; }
 
         [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
-            NetworkHashPerSec = 0;
-
-            if (NetMHps > 0)
-                NetworkHashPerSec = (double)(NetMHps * 1000 * 1000);
-            else if (NetMHashps > 0)
-                NetworkHashPerSec = (double)(NetMHashps * 1000 * 1000);
-            else if (NetworkGhps > 0)
-                NetworkHashPerSec = (double)(NetworkGhps * 1000 * 1000 * 1000);
-            else if (NetworkMhps > 0)
-                NetworkHashPerSec = (double)(NetworkMhps * 1000 * 1000);
-            else if (NetworkHashps > 0)
-                NetworkHashPerSec = NetworkHashps;
+            NetworkCyclesPerSec = NetworkCyclesps;
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿#region License
+#region License
 //
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -148,7 +148,11 @@ namespace CoiniumServ.Shares
         private void HandleInvalidShare(IShare share)
         {
             var miner = (IStratumMiner)share.Miner;
-            miner.InvalidShareCount++;
+            if (share.Error != ShareError.NegativeDifficultyShareOutdatedMiner) {
+                miner.InvalidShareCount++;
+            } else {
+                _logger.Debug("Got negative share from merit-miner 0.1.0 miner. Skipping");
+            }
 
             JsonRpcException exception = null; // the exception determined by the stratum error code.
             switch (share.Error)
@@ -168,11 +172,20 @@ namespace CoiniumServ.Shares
                 case ShareError.JobNotFound:
                     exception = new JobNotFoundError(share.JobId);
                     break;
+                case ShareError.NegativeDifficultyShareOutdatedMiner:
+                    exception = new OtherError("Negative share: most likely old merit-miner used");
+                    break;
+                case ShareError.NegativeDifficultyShare:
+                    exception = new OtherError("Negative share");
+                    break;
                 case ShareError.LowDifficultyShare:
                     exception = new LowDifficultyShare(share.Difficulty);
                     break;
                 case ShareError.NTimeOutOfRange:
                     exception = new OtherError("nTime out of range");
+                    break;
+                case ShareError.IncorrectCycle:
+                    exception = new OtherError("Incorrect cycle");
                     break;
             }
             JsonRpcContext.SetException(exception); // set the stratum exception within the json-rpc reply.
@@ -194,7 +207,10 @@ namespace CoiniumServ.Shares
                 var block = _daemonClient.GetBlock(share.BlockHash.ToHexString()); // query the block.
 
                 if (block == null) // make sure the block exists
+                {
+                    _logger.Debug("Submitted block [{0}] cannot be found with getblock; [{1}]", share.BlockHash.ToHexString(), block.Hash);
                     return false;
+                }
 
                 if (block.Confirmations == -1) // make sure the block is accepted.
                 {
@@ -241,6 +257,11 @@ namespace CoiniumServ.Shares
                 // unlike BlockProcessor's detailed exception handling and decision making based on the error,
                 // here in share-manager we only one-shot submissions. If we get an error, basically we just don't care about the rest
                 // and flag the submission as failed.
+                _logger.Debug("We thought a block was found but it was rejected by the coin daemon; [{0:l}] - reason; {1:l}", share.BlockHash.ToHexString(), e.Message);
+                return false;
+            }
+            catch (Exception e)
+            {
                 _logger.Debug("We thought a block was found but it was rejected by the coin daemon; [{0:l}] - reason; {1:l}", share.BlockHash.ToHexString(), e.Message);
                 return false;
             }

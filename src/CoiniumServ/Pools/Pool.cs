@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -179,7 +179,7 @@ namespace CoiniumServ.Pools
                 HashAlgorithm = _objectFactory.GetHashAlgorithm(Config.Coin);
                 // clculated empirically
                 // TODO: check this value and update if necessary
-                _shareMultiplier = 36;
+                _shareMultiplier = Math.Pow(2, 1);
                 return true;
             }
             catch (TinyIoCResolutionException)

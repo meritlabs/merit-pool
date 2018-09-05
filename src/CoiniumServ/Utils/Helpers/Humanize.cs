@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ namespace CoiniumServ.Utils.Helpers
             var index = 0;
             double rate = hashrate;
 
-            var units = new[] {"H/s", "KH/s", "MH/s", "GH/s", "TH/s", "PH/s", "EH/s", "ZH/s", "YH/s"};
+            var units = new[] {"C/s", "KC/s", "MC/s", "GC/s", "TC/s", "PC/s", "EC/s", "ZC/s", "YC/s"};
 
             while (rate > 1000) {
                 rate = rate/1000;

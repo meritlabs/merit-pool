@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ namespace CoiniumServ.Daemon.Responses
         /// other transactions before this one (by 1-based index in "transactions" list) that must be present in the final block if this one is;
         /// if key is not present, dependencies are unknown and clients MUST NOT assume there aren't any
         /// </summary>
-        public int[] Depends { get; set; }
+        public string[] Depends { get; set; }
 
         /// <summary>
         /// hash/id encoded in little-endian hexadecimal

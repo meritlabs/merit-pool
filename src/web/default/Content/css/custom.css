@@ -343,15 +343,9 @@ body > .header .navbar {
 }
 
 .row.heading .list-group-item {
-  padding: 10px 60px;
+  padding: 10px 30px;
   border: none;
   color: #eee;
-}
-
-@media screen and (max-width: 560px) {
-  .row.heading .list-group-item {
-    padding: 10px 30px;
-  }
 }
 
 .row.heading .list-group-item div {

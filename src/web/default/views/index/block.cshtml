@@ -50,7 +50,7 @@
                             </td>
                             <td class="hidden-xs text-right">@Model.Block.Amount</td>
                             <td class="text-center"><div class="label @(Model.Block.Accounted ?"bg-green":"bg-red")">@(Model.Block.Accounted ? "Yes" : "No")</div></td>
-                            <td class="text-right"><time class="timeago" datetime="@Model.Block.CreatedAt.ToString("o")">@Model.Block.CreatedAt.ToString("o")</time></td>
+                            <td class="text-right"><time class="timeago" datetime="@Model.Block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")">@Model.Block.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time></td>
                         </tr>
                     </tbody>
                 </table>

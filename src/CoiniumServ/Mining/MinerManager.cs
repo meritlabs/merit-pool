@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,23 @@ namespace CoiniumServ.Mining
 {
     public class MinerManager : IMinerManager
     {
-        public int Count { get { return _miners.Count(kvp => kvp.Value.Authenticated); } }
+        public int Count 
+        { 
+            get 
+            { 
+                lock(_minersLock)
+                    return _miners.Count(kvp => kvp.Value.Authenticated); 
+            } 
+        }
 
-        public IList<IMiner> Miners { get { return _miners.Values.ToList(); } }
+        public IList<IMiner> Miners 
+        { 
+            get 
+            { 
+                lock(_minersLock)
+                    return _miners.Values.ToList(); 
+            } 
+        }
 
         public event EventHandler MinerAuthenticated;
 
@@ -86,10 +100,11 @@ namespace CoiniumServ.Mining
 
         public IMiner GetByConnection(IConnection connection)
         {
-            return (from pair in _miners  // returned the miner associated with the given connection.
-                let client = (IClient) pair.Value
-                where client.Connection == connection
-                select pair.Value).FirstOrDefault();
+            lock(_minersLock)
+                return (from pair in _miners  // returned the miner associated with the given connection.
+                        let client = (IClient) pair.Value
+                        where client.Connection == connection
+                        select pair.Value).FirstOrDefault();
         }
 
         public T Create<T>(IPool pool) where T : IGetworkMiner
@@ -134,29 +149,45 @@ namespace CoiniumServ.Mining
         public void Remove(IConnection connection)
         {
             // find the miner associated with the connection.
-            var miner = (from pair in _miners
-                let client = (IClient) pair.Value
-                where client.Connection == connection
-                select pair.Value).FirstOrDefault();
 
-            if (miner == null) // make sure the miner exists
-                return;
+            // lock the list before we read or modify the collection.
+            lock (_minersLock) 
+            {
+                var miner = (from pair in _miners
+                        let client = (IClient) pair.Value
+                        where client.Connection == connection
+                        select pair.Value).FirstOrDefault();
 
-            lock (_minersLock) // lock the list before we modify the collection.
+                if (miner == null) // make sure the miner exists
+                    return;
+
                 _miners.Remove(miner.Id); // remove the miner.
+            }
         }
 
-        public void Authenticate(IMiner miner)
+        public string Authenticate(IMiner miner)
         {
-            // if username validation is not on just authenticate the miner, else ask the current storage layer to do so.
-            miner.Authenticated = !_poolConfig.Miner.ValidateUsername || _storageLayer.Authenticate(miner);
+            var username = miner.Username;
 
-            _logger.Debug(
-                miner.Authenticated ? "Authenticated miner: {0:l} [{1:l}]" : "Miner authentication failed: {0:l} [{1:l}]",
-                miner.Username, ((IClient) miner).Connection.RemoteEndPoint);
+            miner.Account = _accountManager.GetAccountByUsernameOrAddress(username); // query the user.
+            if (miner.Account == null) // if the user doesn't exists check the blockchain
+            {
+                var addressInfo = _daemonClient.ValidateAddress(miner.Username);
 
-            if (!miner.Authenticated)
-                return;
+                // if username validation is not on just authenticate the miner, else ask the current storage layer to do so.
+                if (!addressInfo.IsValid || !addressInfo.IsConfirmed) {
+                    _logger.Debug("Miner authentication failed: {0:l} [{1:l}]", username, ((IClient) miner).Connection.RemoteEndPoint);
+                    return username;
+                }
+
+                var address = addressInfo.Address;
+                username = string.IsNullOrEmpty(addressInfo.Alias) ? address : addressInfo.Alias;
+                _accountManager.AddAccount(new Account(-1, username, address)); // create a new one.
+
+                miner.Account = _accountManager.GetAccountByUsername(username); // re-query the newly created record.
+            }
+
+            miner.Authenticated = true;
 
             if (miner is IStratumMiner) // if we are handling a stratum-miner, apply stratum specific stuff.
             {
@@ -165,18 +196,13 @@ namespace CoiniumServ.Mining
                 stratumMiner.SendMessage(_poolConfig.Meta.MOTD); // send the motd.
             }
 
-            miner.Account = _accountManager.GetAccountByUsername(miner.Username); // query the user.
-            if (miner.Account == null) // if the user doesn't exists.
-            {
-                var addressInfo = _daemonClient.ValidateAddress(miner.Username);
-                var address = addressInfo.Address;
-                var username = string.IsNullOrEmpty(addressInfo.Alias) ? address : addressInfo.Alias;
-                _accountManager.AddAccount(new Account(-1, username, address)); // create a new one.
+            username = miner.Account.Username;
 
-                miner.Account = _accountManager.GetAccountByUsername(username); // re-query the newly created record.
-            }
+            _logger.Debug("Authenticated miner: {0:l} [{1:l}]", username, ((IClient) miner).Connection.RemoteEndPoint);
 
             OnMinerAuthenticated(new MinerEventArgs(miner)); // notify listeners about the new authenticated miner.
+
+            return username;
         }
 
         // todo: consider exposing this event by miner object itself.

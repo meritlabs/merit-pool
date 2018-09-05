@@ -3,9 +3,9 @@
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
+//     Copyright (C) 2017 - 2018 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -110,19 +110,16 @@ namespace CoiniumServ.Payments
                     if (user == null) // if the user doesn't exist
                         continue; // just skip.
 
-                    if (!perUserTransactions.ContainsKey(user.Username)
-                    ) // check if our list of transactions to be executed already contains an entry for the user.
-                    {
+                    if (!perUserTransactions.ContainsKey(user.Username)) {
                         // if not, create an entry that contains the list of transactions for the user.
+                        if (_poolConfig.Payments.ValidateAddress) {
+                            // see if user payout address is directly payable from the pool's main daemon connection
+                            // which happens when a user connects an XYZ pool and want his payments in XYZ coin.
+                            var result = _daemonClient.ValidateAddress(user.Address); // does the user have a directly payable address set?
 
-                        // see if user payout address is directly payable from the pool's main daemon connection
-                        // which happens when a user connects an XYZ pool and want his payments in XYZ coin.
-
-                        var result = _daemonClient.ValidateAddress(user.Address); // does the user have a directly payable address set?
-
-                        if (!result.IsValid) // if not skip the payment and let it handled by auto-exchange module.
-                            continue;
-
+                            if (!result.IsValid || !result.IsConfirmed) // if not skip the payment and let it handled by auto-exchange module.
+                                continue;
+                        }
                         perUserTransactions.Add(user.Username, new List<ITransaction>());
                     }
 
@@ -156,7 +153,7 @@ namespace CoiniumServ.Payments
                 var outputs = filtered.ToDictionary(x => x.Key, x => x.Value.Sum(y => y.Payment.Amount));
 
                 // send the payments all-together.
-                var txHash = _daemonClient.SendMany(string.Empty, outputs);
+                var txHash = _daemonClient.SendMany(string.Empty, outputs, 1, "", "MeritPool");
 
                 // loop through all executed payments
                 filtered.ToList().ForEach(x => x.Value.ForEach(y =>

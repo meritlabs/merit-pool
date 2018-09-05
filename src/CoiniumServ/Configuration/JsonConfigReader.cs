@@ -1,22 +1,22 @@
 ﻿#region License
-// 
+//
 //     MIT License
 //
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
+//
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Hüseyin Uslu, shalafiraistlin at gmail dot com
-//     https://github.com/bonesoul/CoiniumServ
-// 
+//     Copyright (C) 2017 - 2018 The Merit Foundation
+//
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
 //     in the Software without restriction, including without limitation the rights
 //     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 //     copies of the Software, and to permit persons to whom the Software is
 //     furnished to do so, subject to the following conditions:
-//     
+//
 //     The above copyright notice and this permission notice shall be included in all
 //     copies or substantial portions of the Software.
-//     
+//
 //     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// 
+//
 #endregion
 
 using System;
@@ -40,7 +40,7 @@ namespace CoiniumServ.Configuration
     // TODO: let this be a factory and add log.forcontext<>
     public class JsonConfigReader : IJsonConfigReader
     {
-        private const string Comments = @"#(.*?)\r?\n";
+        private const string Comments = @"[^/]#(.*?)\r?\n";
 
         public dynamic Read(string fileName)
         {
@@ -52,7 +52,7 @@ namespace CoiniumServ.Configuration
                 if (json == null) // make sure we were able to load the json file.
                     return null;
 
-                json = CleanComments(json); // strip out comment lines that starts with # as they'll be preventing validation.
+                json = CleanComments(json); // strip out comment lines that starts with # as they'll be preventing validation. '/#' are allowed as a hash in a link
                 var valid = ValidateJson(json, fileName); // check if it's valid.
 
                 return !valid ? null : Config.ApplyJson(json, new ConfigObject()); // read configuration from the json.

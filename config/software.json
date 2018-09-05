@@ -2,7 +2,7 @@
     "miner": [
         {
             "name": "merit-miner",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "platforms": [
                 "cpu"
             ],
@@ -11,6 +11,22 @@
             ],
             "site": "https://github.com/meritlabs/merit-miner",
             "download": {
+            }
+        },
+        {
+            "name": "Desktop Lightwallet",
+            "version": "1.6.5",
+            "platforms": [
+                "cpu"
+            ],
+            "algorithms": [
+                "cuckoo"
+            ],
+            "site": "https://www.merit.me/get-started/#get-merit-desktop",
+            "download": {
+                "windows": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet%20Setup%201.6.5.exe",
+                "linux": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet-1.6.5.AppImage",
+                "macos": "https://www.merit.me/uploads/2018/desktop/Merit%20Lightwallet-1.6.5.dmg"
             }
         }
     ]
