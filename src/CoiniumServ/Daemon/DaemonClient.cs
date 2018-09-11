@@ -695,9 +695,10 @@ namespace CoiniumServ.Daemon
         /// <returns>The transaction ID if succesful.</returns>
         public string SendMany(string fromAccount, Dictionary<string, decimal> toBitcoinAddress, int minConf = 1, string comment = "", string data = "")
         {
+            var feesFrom = toBitcoinAddress.Keys.ToArray();
             // "UNSET" is a default estimate_mode parameter in meritd.
             // setting it to null gives an error "JSON value is not a string as expected"
-            return MakeRequest<string>("sendmany", fromAccount, toBitcoinAddress, minConf, comment, null, null, null, "UNSET", data);
+            return MakeRequest<string>("sendmany", fromAccount, toBitcoinAddress, minConf, comment, feesFrom, null, null, "UNSET", data);
         }
 
         /// <summary>
