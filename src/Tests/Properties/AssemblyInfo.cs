@@ -5,7 +5,7 @@
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Copyright (C) 2017 - 2018 The Merit Foundation
+//     Copyright (C) 2017 - 2019 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ using CoiniumServ;
 [assembly: AssemblyDescription("Tests for CoiniumServ")]
 [assembly: AssemblyCompany("CoiniumServ")]
 [assembly: AssemblyProduct("CoiniumServ.Tests - " + VersionInfo.CodeName)]
-[assembly: AssemblyCopyright("Copyright (C) 2013 - 2018, CoiniumServ project, http://www.coinium.org -  http://www.coiniumserv.com")]
+[assembly: AssemblyCopyright("Copyright (C) 2013 - 2019, CoiniumServ project, http://www.coinium.org -  http://www.coiniumserv.com .\nCopyright (C) 2017 - 2019 The Merit Foundation")]
 [assembly: AssemblyTrademark("CoiniumServ")]
 [assembly: AssemblyCulture("")]
 
