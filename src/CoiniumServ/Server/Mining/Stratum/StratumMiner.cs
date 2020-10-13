@@ -214,7 +214,6 @@ namespace CoiniumServ.Server.Mining.Stratum
                         Software = MinerSoftware.Unknown;
                         break;
                 }
-//zjazz_cuda_win
                 SoftwareVersion = new Version(version);
             }
             catch (Exception) // on unknown signature
