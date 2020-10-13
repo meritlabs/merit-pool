@@ -5,7 +5,7 @@
 //     CoiniumServ - Crypto Currency Mining Pool Server Software
 //
 //     Copyright (C) 2013 - 2017, CoiniumServ Project
-//     Copyright (C) 2017 - 2019 The Merit Foundation
+//     Copyright (C) 2017 - 2020 The Merit Foundation
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ namespace CoiniumServ.Utils
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("Copyright (C) 2013 - 2019, Coinium project - https://github.com/CoiniumServ/CoiniumServ");
-            Console.WriteLine("Copyright (C) 2017 - 2019 The Merit Foundation");
+            Console.WriteLine("Copyright (C) 2017 - 2020 The Merit Foundation");
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("CoiniumServ comes with ABSOLUTELY NO WARRANTY.");
