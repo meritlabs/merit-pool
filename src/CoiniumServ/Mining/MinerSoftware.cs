@@ -39,5 +39,6 @@ namespace CoiniumServ.Mining
         CPUMiner,
         MeritMiner,
         DLW,
+        Zjazz,
     }
 }

@@ -183,7 +183,6 @@ namespace CoiniumServ.Server.Mining.Stratum
                 var software = data[0].ToLower();
                 var version = data[1];
 
-                Console.WriteLine("Miner:", software);
                 switch (software)
                 {
                     case "bfgminer":
@@ -207,11 +206,15 @@ namespace CoiniumServ.Server.Mining.Stratum
                     case "dlw":
                         Software = MinerSoftware.DLW;
                         break;
+                    case "zjazz_cuda_win":
+                    case "zjazz_cuda_linux":
+                        Software = MinerSoftware.Zjazz;
+                        break;
                     default:
                         Software = MinerSoftware.Unknown;
                         break;
                 }
-
+//zjazz_cuda_win
                 SoftwareVersion = new Version(version);
             }
             catch (Exception) // on unknown signature
