@@ -183,6 +183,7 @@ namespace CoiniumServ.Server.Mining.Stratum
                 var software = data[0].ToLower();
                 var version = data[1];
 
+                Console.WriteLine("Miner:", software);
                 switch (software)
                 {
                     case "bfgminer":
