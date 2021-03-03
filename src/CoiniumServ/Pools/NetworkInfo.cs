@@ -28,6 +28,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using CoiniumServ.Algorithms;
 using CoiniumServ.Daemon;
 using CoiniumServ.Daemon.Errors;
@@ -63,6 +64,8 @@ namespace CoiniumServ.Pools
 
         public bool Healthy { get; private set; }
 
+        public UInt64 FailedHealthChecks { get; private set; }
+
         public string ServiceResponse { get; private set; } // todo implement this too for /pool/COIN/network
 
         private readonly IDaemonClient _daemonClient;
@@ -72,6 +75,8 @@ namespace CoiniumServ.Pools
         private readonly IPoolConfig _poolConfig;
 
         private readonly ILogger _logger;
+
+        private static UInt64 MaxFailedHealthChecks = 3;
 
         public NetworkInfo(IDaemonClient daemonClient, IHashAlgorithm hashAlgorithm, IPoolConfig poolConfig)
         {
@@ -175,6 +180,18 @@ namespace CoiniumServ.Pools
             {
                 _logger.Error("Can not read getblocktemplate(): {0:l}", e.Message);
                 Reward = 0;
+            }
+
+            if (Healthy && FailedHealthChecks > 0) {
+                FailedHealthChecks = 0;
+            }
+
+            if (!Healthy) {
+                ++FailedHealthChecks;
+            }
+
+            if (!Healthy && FailedHealthChecks >= MaxFailedHealthChecks) {
+                Process.GetCurrentProcess().Kill();
             }
         }
 
