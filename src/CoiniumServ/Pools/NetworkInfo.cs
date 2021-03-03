@@ -183,14 +183,17 @@ namespace CoiniumServ.Pools
             }
 
             if (Healthy && FailedHealthChecks > 0) {
+                _logger.Error("Healthy again.");
                 FailedHealthChecks = 0;
             }
 
             if (!Healthy) {
+                _logger.Error("Unhealthy, updating failure counter.");
                 ++FailedHealthChecks;
             }
 
             if (!Healthy && FailedHealthChecks >= MaxFailedHealthChecks) {
+                _logger.Error("Healthcheck failures maximum reached.");
                 Process.GetCurrentProcess().Kill();
             }
         }
