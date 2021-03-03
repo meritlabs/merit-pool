@@ -188,8 +188,8 @@ namespace CoiniumServ.Pools
             }
 
             if (!Healthy) {
-                _logger.Error("Unhealthy, updating failure counter.");
                 ++FailedHealthChecks;
+                _logger.Error("Unhealthy. Updating failure counter. New value: {0}.", FailedHealthChecks);
             }
 
             if (!Healthy && FailedHealthChecks >= MaxFailedHealthChecks) {
